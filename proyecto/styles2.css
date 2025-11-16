@@ -1,0 +1,65 @@
+body{
+margin: 0;
+}
+header{
+    background-color: #ace793;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+header .logo{
+    width: auto;
+    display: flex;
+    align-items: center;
+}
+.logo h1{
+    color: darkslategrey;
+    margin-left: 10px;
+}
+header ol{
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+header ol li{
+    display: inline;
+}
+header ol li a{
+    text-decoration: none;
+    color: darkslategrey;
+    font-weight: bold;
+    padding: 20px;
+}
+.dashboard-content{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px;
+}
+.dashboard-welcome h2{
+    color: darkgreen;
+    font-size: 50px;
+    font-weight: 900;
+}
+.dashboard-welcome p{
+    color: #333;
+    font-size: 20px;
+    padding-top: 20px;
+    padding-left: 3px;
+}
+.dashboard-content img{
+    width: 500px;
+    margin-left: 100px;
+}
+
+.user-profile a {
+     background: white;
+    display: flex;
+    justify-content: center;
+    border-radius: 5px;
+    text-decoration: none;
+    color: black;
+    padding: 10px;
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Empleados - CANINU</title>
+    <link rel="stylesheet" href="styles2.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="Caninu.png" alt="logoEmpresa" width="100" height="100">
+            <h1>CANINU</h1>
+        </div>
+        <ol>
+            <li><a href="#">Atención de Citas</a></li>
+            <li><a href="#">Control de Mascotas</a></li>
+            <li><a href="#">Reportes diarios</a></li>
+        </ol>
+        <div class="user-profile">
+            <span id="usernameField">Empleado: </span>
+            <div id="CS-button"> <a href="#" id="logoutBtn">Cerrar sesión</a> </div>
+        </div>
+    </header>
+
+    <section class="dashboard-content">
+        <div class="dashboard-welcome">
+            <h2>Panel del Empleado</h2>
+            <p>Gestiona citas, mascotas atendidas y reportes diarios.</p>
+        </div>
+        <img src="R.png" alt="Dashboard Image">
+    </section>
+
+    <script>
+        async function loadSession() {
+            const res = await fetch("/session-info", { credentials: "include" });
+            const data = await res.json();
+
+            if (!data.logged || data.user.rol !== "empleado") {
+                window.location.href = "login.html";
+                return;
+            }
+
+            document.getElementById("usernameField").innerText = "Empleado: " + data.user.username;
+        }
+
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            await fetch("/logout", { credentials: "include" });
+            window.location.href = "login.html";
+        });
+
+        loadSession();
+    </script>
+</body>
+</html>
