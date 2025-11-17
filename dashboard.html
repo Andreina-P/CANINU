@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard CANINU - Usuario</title>
     <link rel="stylesheet" href="styles2.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -13,7 +16,7 @@
             <h1>CANINU</h1>
         </div>
         <ol>
-            <li><a href="secundarias/registro-citas.html">Citas</a></li>
+            <li><a href="secundarias/registro-citas.html">Agendar Cita</a></li>
             <li><a href="#">Mascotas</a></li>
         </ol>
         <div class="user-profile">
@@ -28,6 +31,14 @@
             <p>Desde aquí puedes gestionar las citas y las mascotas registradas.</p>
         </div>
         <img src="R.png" alt="Dashboard Image">
+
+        <div class="citas-preview">
+            <h2>Tus Próximas Citas</h2>
+            <div id="citas-container-preview">
+                <!-- Las citas se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+
     </section>
 
     <script>
@@ -37,10 +48,11 @@
 
             if (!data.logged) {
                 window.location.href = "login.html";
-                return;
+                return false; // Devuelve false si no está logueado
             }
 
             document.getElementById("usernameField").innerText = "Usuario: " + data.user.username;
+            return true; // Devuelve true si está logueado
         }
 
         document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -48,7 +60,72 @@
             window.location.href = "login.html";
         });
 
-        loadSession();
+        // --- Cargar Vista Previa de Citas ---
+        async function cargarCitasPreview() {
+            try {
+                // 1. Usamos el mismo endpoint que 'mis-citas.html'
+                const response = await fetch("/api/citas/mis-citas", {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+
+                if (!result.success) throw new Error(result.message);
+
+                // 2. Filtramos en JavaScript para encontrar citas futuras
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0); // Ignorar la hora para la comparación
+
+                const proximasCitas = result.data
+                    .filter(cita => new Date(cita.fecha) >= hoy) // Solo citas de hoy en adelante
+                    .sort((a, b) => new Date(a.fecha) - new Date(b.fecha) || a.hora.localeCompare(b.hora)) // Ordenar por fecha ASC
+                    .slice(0, 3); // Tomar solo las primeras 3
+
+                // 3. Renderizamos las tarjetas
+                const container = document.getElementById('citas-container-preview');
+                container.innerHTML = ''; 
+
+                if (proximasCitas.length === 0) {
+                    container.innerHTML = '<p id="no-citas">No tienes próximas citas programadas.</p>';
+                    return;
+                }
+
+                proximasCitas.forEach(cita => {
+                    const citaCard = document.createElement('div');
+                    citaCard.className = 'cita-card';
+
+                    const fecha = new Date(cita.fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+                    const hora = cita.hora.substring(0, 5);
+
+                    citaCard.innerHTML = `
+                        <div class="cita-header">
+                            <span class="cita-mascota">${cita.nombre_mascota}</span>
+                            <span class="cita-estado">${cita.estado}</span>
+                        </div>
+                        <div class="cita-body">
+                            <p><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> ${fecha}</p>
+                            <p><i class="fas fa-clock"></i> <strong>Hora:</strong> ${hora}</p>
+                            <p><i class="fas fa-notes-medical"></i> <strong>Tipo:</strong> ${cita.tipo_cita}</p>
+                        </div>
+                    `;
+                    container.appendChild(citaCard);
+                });
+
+            } catch (error) {
+                console.error("Error al cargar la vista previa de citas:", error);
+                document.getElementById('citas-container-preview').innerHTML = '<p id="no-citas">Error al cargar tus citas.</p>';
+            }
+        }
+
+        // --- Carga inicial (Actualizada) ---
+        document.addEventListener("DOMContentLoaded", async () => {
+            const isLoggedIn = await loadSession();
+            
+            // Si el usuario está logueado, cargamos sus citas
+            if (isLoggedIn) {
+                cargarCitasPreview();
+            }
+        });
     </script>
 </body>
 </html>

@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CANINU - Agendar Cita</title>
     <link rel="stylesheet" href="../styles2.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%); /* Tonos más suaves */
+            background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%);
+            /* Tonos más suaves */
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -22,7 +25,8 @@
             flex: 1;
             padding: 40px 20px;
             max-width: 800px;
-            margin: 20px auto; /* Añadido margen superior */
+            margin: 20px auto;
+            /* Añadido margen superior */
             width: 100%;
         }
 
@@ -35,7 +39,8 @@
         .main-title {
             font-size: 3rem;
             font-weight: 700;
-            color: #2d3748; /* Color oscuro para contraste */
+            color: #2d3748;
+            /* Color oscuro para contraste */
             margin-bottom: 10px;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
@@ -58,14 +63,22 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Grid del formulario */
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr; /* Una sola columna */
+            grid-template-columns: 1fr;
+            /* Una sola columna */
             gap: 25px;
             margin-bottom: 30px;
         }
@@ -82,7 +95,8 @@
             font-size: 1.1rem;
         }
 
-        .form-input, .form-select {
+        .form-input,
+        .form-select {
             width: 100%;
             padding: 15px 20px;
             border: 2px solid rgba(74, 144, 226, 0.2);
@@ -95,13 +109,14 @@
             box-sizing: border-box;
         }
 
-        .form-input:focus, .form-select:focus {
+        .form-input:focus,
+        .form-select:focus {
             outline: none;
             border-color: #4A90E2;
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
             background: rgba(255, 255, 255, 0.9);
         }
-        
+
         /* Botón de Guardar */
         .btn-guardar {
             background: linear-gradient(135deg, #2d3748, #1a202c);
@@ -132,13 +147,14 @@
             padding: 15px 20px;
             border-radius: 15px;
             margin-bottom: 20px;
-            display: none; /* Oculto por defecto */
+            display: none;
             align-items: center;
             gap: 10px;
             font-weight: 600;
         }
     </style>
 </head>
+
 <body>
     <header>
         <div class="logo">
@@ -164,7 +180,7 @@
 
         <!-- Contenedor del Formulario -->
         <div class="form-container">
-            
+
             <div id="successMessage" class="success-message">
                 <i class="fas fa-check-circle"></i>
                 ¡Cita agendada exitosamente!
@@ -197,18 +213,49 @@
                     </div>
 
                     <!-- Seleccionar mascota -->
-                        <div class="form-group full-width">
-                            <label class="form-label">Seleccionar mascota:</label>
-                            <select class="form-select" id="mascotaSelect" required>
-                                <option value="">Seleccionar mascota</option>
-                            </select>
-                        </div> 
-
-                    <!-- Motivo -->
                     <div class="form-group">
-                        <label class="form-label">Motivo:</label>
-                        <input type="text" class="form-input" id="motivoCita" placeholder="Ej: Consulta general, vacunación..." required>
+                        <label class="form-label">Seleccionar mascota:</label>
+                        <select class="form-select" id="mascotaSelect" required>
+                            <option value="">Seleccionar mascota</option>
+                            <option value="1">Mascota Ejemplo</option>
+                        </select>
                     </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Cita:</label>
+                        <select class="form-select" id="tipoCita" required onchange="mostrarCampos()">
+                            <option value="">Seleccione el tipo...</option>
+                            <option value="Medico">Consulta Médica</option>
+                            <option value="Estetico">Estética y Aseo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="grupoMedico" style="display: none;">
+                        <label class="form-label">Motivo de consulta:</label>
+                        <select class="form-select" id="motivoMedico">
+                            <option value="">Seleccione el síntoma/motivo...</option>
+                            <option value="Consulta General">Consulta General / Revisión</option>
+                            <option value="Vacunación">Vacunación</option>
+                            <option value="Desparasitación">Desparasitación</option>
+                            <option value="Vómitos / Diarrea">Vómitos / Diarrea</option>
+                            <option value="Problemas de Piel">Problemas de Piel</option>
+                            <option value="Cojea / Dolor">Cojea / Dolor</option>
+                            <option value="Apatía / No come">Apatía / No come</option>
+                            <option value="Otro">Otro (se especificará en consulta)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="grupoEstetico" style="display: none;">
+                        <label class="form-label">Servicio deseado:</label>
+                        <select class="form-select" id="servicioEstetico">
+                            <option value="">Seleccione el servicio...</option>
+                            <option value="Baño Completo">Baño Completo</option>
+                            <option value="Corte de Pelo">Corte de Pelo</option>
+                            <option value="Corte de Uñas">Corte de Uñas</option>
+                            <option value="Limpieza Dental">Limpieza Dental</option>
+                        </select>
+                    </div>
+
                 </div>
 
                 <button type="submit" class="btn-guardar">
@@ -219,17 +266,16 @@
     </div>
 
     <script>
+        // --- Gestión de Sesión ---
         async function loadSession() {
             const res = await fetch("/session-info", { credentials: "include" });
             const data = await res.json();
-
             if (!data.logged) {
                 window.location.href = "login.html";
                 return false;
             }
-
             document.getElementById("usernameField").innerText = "Usuario: " + data.user.username;
-            return true; // Devuelve true si está logueado
+            return true;
         }
 
         document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -237,35 +283,108 @@
             window.location.href = "login.html";
         });
 
-        // --- 2. SCRIPT DEL NUEVO FORMULARIO ---
+        // --- Lógica del Formulario Dinámico ---
+        function mostrarCampos() {
+            const tipo = document.getElementById('tipoCita').value;
+            const grupoMedico = document.getElementById('grupoMedico');
+            const grupoEstetico = document.getElementById('grupoEstetico');
+            const inputMedico = document.getElementById('motivoMedico');
+            const inputEstetico = document.getElementById('servicioEstetico');
+
+            if (tipo === 'Medico') {
+                grupoMedico.style.display = 'block';
+                grupoEstetico.style.display = 'none';
+                inputMedico.required = true;
+                inputEstetico.required = false;
+            } else if (tipo === 'Estetico') {
+                grupoMedico.style.display = 'none';
+                grupoEstetico.style.display = 'block';
+                inputMedico.required = false;
+                inputEstetico.required = true;
+            } else {
+                grupoMedico.style.display = 'none';
+                grupoEstetico.style.display = 'none';
+                inputMedico.required = false;
+                inputEstetico.required = false;
+            }
+        }
+        
+        // --- NUEVA FUNCIÓN: Cargar Mascotas ---
+        async function cargarMascotas() {
+            try {
+                const response = await fetch("/api/mascotas/mis-mascotas", {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (!result.success) throw new Error(result.message);
+
+                const selectMascota = document.getElementById('mascotaSelect');
+                selectMascota.innerHTML = '<option value="">Seleccionar mascota</option>'; // Limpiar
+
+                if (result.data.length === 0) {
+                     selectMascota.innerHTML = '<option value="">No tienes mascotas registradas</option>';
+                     selectMascota.disabled = true;
+                } else {
+                    result.data.forEach(mascota => {
+                        const option = document.createElement('option');
+                        option.value = mascota.id;
+                        option.textContent = mascota.nombre;
+                        selectMascota.appendChild(option);
+                    });
+                    selectMascota.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error al cargar mascotas:', error);
+                document.getElementById('mascotaSelect').innerHTML = '<option value="">Error al cargar</option>';
+            }
+        }
+
+
+        // --- Carga inicial ---
         document.addEventListener("DOMContentLoaded", async () => {
             const isLoggedIn = await loadSession();
             
             if (isLoggedIn) {
+                // Poner fecha mínima
                 const hoy = new Date().toISOString().split('T')[0];
                 document.getElementById('fechaCita').min = hoy;
 
+                // --- CARGAR MASCOTAS AL INICIAR ---
+                await cargarMascotas();
+
+                // Manejador del envío
                 document.getElementById('agendarCitaForm').addEventListener('submit', async function (e) {
                     e.preventDefault();
 
+                    // --- DATOS DEL FORMULARIO ACTUALIZADOS ---
                     const fecha = document.getElementById('fechaCita').value;
                     const hora = document.getElementById('horaCita').value;
-                    const motivo = document.getElementById('motivoCita').value;
+                    const tipoCita = document.getElementById('tipoCita').value;
+                    const idMascota = document.getElementById('mascotaSelect').value; // CAMBIO
+                    
+                    let detalle = "";
+                    if (tipoCita === 'Medico') {
+                        detalle = document.getElementById('motivoMedico').value;
+                    } else if (tipoCita === 'Estetico') {
+                        detalle = document.getElementById('servicioEstetico').value;
+                    }
 
-                    if (!fecha || !hora || !motivo) {
-                        alert("Por favor complete todos los campos.");
+                    // Validación
+                    if (!fecha || !hora || !tipoCita || !detalle || !idMascota) {
+                        alert("Por favor complete todos los campos, incluyendo la mascota.");
                         return;
                     }
 
-                    const formData = { fecha, hora, motivo };
+                    const formData = { fecha, hora, tipoCita, detalle, idMascota }; // CAMBIO
 
                     try {
-                        const response = await fetch("/api/citas", {
+                        // --- ENDPOINT ACTUALIZADO ---
+                        const response = await fetch("/api/citas/", { // Ruta base /api/citas/ con POST
                             method: "POST",
-                            headers: { 
-                                "Content-Type": "application/json",
-                            },
-                            credentials: "include", // Envía la cookie de sesión
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
                             body: JSON.stringify(formData)
                         });
 
@@ -276,26 +395,26 @@
                             successMessage.style.display = 'flex';
                             successMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                            // Limpiar formulario
                             document.getElementById('agendarCitaForm').reset();
+                            mostrarCampos();
                             
                             setTimeout(() => {
                                 successMessage.style.display = 'none';
                                 alert("¡Cita agendada exitosamente!");
-                                window.location.href = "dashboard.html";
-                            }, 3000);
+                            }, 2000);
 
                         } else {
-                            alert("Error al agendar la cita: " + result.message);
+                            alert("Error: " + result.message);
                         }
 
                     } catch (error) {
-                        console.error("Error al enviar formulario:", error);
-                        alert("Hubo un error de conexión al agendar la cita.");
+                        console.error("Error:", error);
+                        alert("Hubo un error de conexión.");
                     }
                 });
             }
         });
     </script>
 </body>
+
 </html>

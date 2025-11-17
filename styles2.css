@@ -107,3 +107,92 @@ header ol li a {
     box-shadow: 0 6px 12px rgba(208, 0, 0, 0.4);
     transform: translateY(-2px);
 }
+
+/*Ver citas*/
+.citas-preview {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 40px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.citas-preview h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-top: 0;
+    margin-bottom: 25px;
+    border-bottom: 2px solid rgba(45, 55, 72, 0.1);
+    padding-bottom: 15px;
+}
+
+/* Contenedor de las tarjetas */
+#citas-container-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Tarjeta de Cita */
+.cita-card {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.cita-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+}
+
+.cita-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.cita-mascota {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.cita-estado {
+    background-color: #f6e05e;
+    color: #744210;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.cita-body p {
+    font-size: 0.95rem;
+    color: #4a5568;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cita-body p strong {
+    color: #2d3748;
+    min-width: 70px;
+}
+
+#no-citas {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #4a5568;
+    padding: 20px;
+    grid-column: 1 / -1;
+}
