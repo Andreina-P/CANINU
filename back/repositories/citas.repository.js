@@ -24,6 +24,24 @@ export const create = async (citaData) => {
 };
 
 /**
+ * Busca si ya existe una cita para una mascota específica
+ * en una fecha y hora determinadas.
+ */
+export const findByPetAndDateTime = async (id_mascota, fecha, hora) => {
+    const query = `
+        SELECT id FROM citas 
+        WHERE id_mascota = $1 AND fecha = $2 AND hora = $3
+    `;
+    try {
+        const { rows } = await pool.query(query, [id_mascota, fecha, hora]);
+        return rows[0]; // Devuelve la cita si existe, o undefined si no
+    } catch (error) {
+        console.error("Error en repositorio al buscar cita duplicada:", error);
+        throw error;
+    }
+};
+
+/**
  * Busca todas las citas de un usuario específico.
  */
 export const findByUserId = async (id_usuario) => {

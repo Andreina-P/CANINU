@@ -1,29 +1,38 @@
 import { Router } from 'express';
 import * as CitasRepository from '../repositories/citas.repository.js';
 
+import { validateCitaCreation } from '../middleware/validation.middleware.js';
+
 const router = Router();
 
-// Nos aseguramos de que solo usuarios logueados puedan usar estas rutas.
 const verificarSesion = (req, res, next) => {
+// ... (código existente, sin cambios) ...
     if (!req.session.user || !req.session.user.id) {
         return res.status(401).json({ success: false, message: 'No autorizado. Debe iniciar sesión.' });
     }
-    // Si tiene sesión, guardamos el id para usarlo más fácil
     req.id_usuario = req.session.user.id;
     next();
 };
 
-// Aplicamos el middleware a TODAS las rutas de este archivo
 router.use(verificarSesion);
 
-
-// --- CRUD de Citas ---
-
-// POST /api/citas/
-// Crear una nueva cita
-router.post('/', async (req, res) => {
+// --- 2. APLICAR LAS VALIDACIONES AL CREAR CITA ---
+router.post('/', validateCitaCreation, async (req, res) => {
     try {
-        // Combinamos datos del formulario (req.body) con el id del usuario (de la sesión)
+        // --- 3. LÓGICA DE DUPLICADOS ---
+        const { fecha, hora, idMascota } = req.body;
+        
+        const citaExistente = await CitasRepository.findByPetAndDateTime(idMascota, fecha, hora);
+        
+        if (citaExistente) {
+            // Error 409 (Conflict) es el estándar para "recurso duplicado"
+            return res.status(409).json({ 
+                success: false, 
+                message: 'Ya tienes una cita para esta mascota en la misma fecha y hora.' 
+            });
+        }
+
+        // Si pasa las validaciones, creamos la cita
         const citaData = {
             ...req.body,
             id_usuario: req.id_usuario 
@@ -31,7 +40,9 @@ router.post('/', async (req, res) => {
 
         const nuevaCita = await CitasRepository.create(citaData);
         res.status(201).json({ success: true, data: nuevaCita });
+
     } catch (error) {
+        console.error("Error en router al crear cita:", error); // Logueamos el error
         res.status(500).json({ success: false, message: 'Error interno al crear la cita.' });
     }
 });
