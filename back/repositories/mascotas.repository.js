@@ -1,21 +1,55 @@
-import { pool } from '../config/db.js';
+import {pool} from '../config/db.js';
 
 /**
- * Busca todas las mascotas de un usuario específico.
+ * Desactiva (eliminación lógica) una mascota por su ID.
+ * Establece la columna 'activo' a FALSE.
+ * @param {number} mascotaId - ID de la mascota a desactivar.
+ * @returns {number} El número de filas afectadas (debería ser 1).
  */
-export const findByUserId = async (id_usuario) => {
+export async function deactivatePet(mascotaId) { // <<-- YA ESTÁ DEFINIDA
     const query = `
-        SELECT id, nombre 
-        FROM mascotas 
-        WHERE id_usuario = $1 
+        UPDATE mascotas
+        SET activo = FALSE
+        WHERE id = $1
+        RETURNING id;
+    `;
+    const result = await pool.query(query, [mascotaId]);
+    return result.rowCount;
+}
+
+/**
+ * Inserta una nueva mascota en la base de datos.
+ * @param {object} data - Datos de la mascota (nombre, especie, raza, fecha_nacimiento).
+ * @param {number} userId - ID del usuario que registra la mascota.
+ * @returns {number} El ID de la mascota recién creada.
+ */
+export async function createPet(data, userId) {
+    const { nombre, especie, raza, fecha_nacimiento, sexo, peso } = data;
+
+    const query = `
+        INSERT INTO mascotas (id_usuario, nombre, sexo, peso, especie, raza, fecha_nacimiento)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id;
+    `;
+    const values = [userId, nombre, sexo, peso || null, especie, raza || null, fecha_nacimiento || null];
+
+    const result = await pool.query(query, values);
+    return result.rows[0].id;
+}
+
+/**
+ * Obtiene todas las mascotas de un usuario.
+ * @param {number} userId - ID del usuario.
+ * @returns {Array} Lista de objetos de mascotas.
+ */
+export async function getPetsByUserId(userId) {
+    const query = `
+        SELECT id, nombre, especie, raza, fecha_nacimiento, sexo, peso
+        FROM mascotas
+        WHERE id_usuario = $1
+        AND activo = TRUE
         ORDER BY nombre;
     `;
-    
-    try {
-        const { rows } = await pool.query(query, [id_usuario]);
-        return rows;
-    } catch (error) {
-        console.error("Error en repositorio al buscar mascotas por usuario:", error);
-        throw error;
-    }
-};
+    const result = await pool.query(query, [userId]);
+    return result.rows;
+}
