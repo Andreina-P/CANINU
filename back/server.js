@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import express from "express";
 import session from "express-session";
 import cors from "cors";
@@ -5,6 +6,8 @@ import bodyParser from "body-parser";
 import pkg from "pg";
 import path from "path";
 import { fileURLToPath } from "url";
+
+dotenv.config();
 
 const { Pool } = pkg;
 const app = express();
@@ -31,16 +34,16 @@ app.use(
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use(express.static(__dirname));
+const rootPath = path.join(__dirname, "../");
+app.use(express.static(rootPath));
 
 const pool = new Pool({
-  user: "admin",
-  host: "localhost",
-  database: "postgres",
-  password: "admin123",
-  port: 5432
+  user: process.env.DB_USER,
+  host: process.env.DB_SERVER,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: Number(process.env.DB_PORT)
 });
-
 
 app.post("/register", async (req, res) => {
   const { nombre, email, password } = req.body;
@@ -153,7 +156,7 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "login.html"));
+  res.sendFile(path.join(rootPath, "login.html"));
 });
 
 app.listen(3000, () => {

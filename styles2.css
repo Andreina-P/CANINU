@@ -1,7 +1,13 @@
-body{
-margin: 0;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
 }
-header{
+
+header {
     background-color: #ace793;
     display: flex;
     justify-content: space-between;
@@ -9,57 +15,95 @@ header{
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-header .logo{
+
+header .logo {
     width: auto;
     display: flex;
     align-items: center;
 }
-.logo h1{
+
+.logo h1 {
     color: darkslategrey;
     margin-left: 10px;
 }
-header ol{
+
+header ol {
     list-style: none;
     display: flex;
     gap: 30px;
 }
-header ol li{
+
+header ol li {
     display: inline;
 }
-header ol li a{
+
+header ol li a {
     text-decoration: none;
     color: darkslategrey;
     font-weight: bold;
     padding: 20px;
 }
-.dashboard-content{
+
+.dashboard-content {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 100px;
 }
-.dashboard-welcome h2{
+
+.dashboard-welcome h2 {
     color: darkgreen;
     font-size: 50px;
     font-weight: 900;
 }
-.dashboard-welcome p{
+
+.dashboard-welcome p {
     color: #333;
     font-size: 20px;
     padding-top: 20px;
     padding-left: 3px;
 }
-.dashboard-content img{
+
+.dashboard-content img {
     width: 500px;
     margin-left: 100px;
 }
 
-.user-profile a {
-     background: white;
+.user-profile {
     display: flex;
-    justify-content: center;
-    border-radius: 5px;
+    align-items: center;
+    gap: 15px;
+}
+
+#usernameField {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.9rem;
+}
+
+#logoutBtn {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #e63946;
+    color: white;
+    font-weight: 600;
     text-decoration: none;
-    color: black;
-    padding: 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
+}
+
+#logoutBtn:hover {
+    background-color: #d00000;
+    color: white;
+    box-shadow: 0 6px 12px rgba(208, 0, 0, 0.4);
+    transform: translateY(-2px);
 }
