@@ -1,0 +1,80 @@
+body {
+      font-family: Inter, system-ui, Arial;
+      background: #fff;
+      height: 100vh; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-section {
+      flex-direction: column;
+      display: flex;
+      align-items: center;
+      background-color: #f0ecec;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      width: 350px;
+    }
+
+    .login-section img {
+      margin-bottom: 20px;
+    }
+
+    .login-section h1 {
+      color: darkgreen;
+      margin-bottom: 20px;
+    }
+
+    .login-section label {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .login-section input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .login-section button {
+      background: #67bf41;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      margin-top: 20px;
+      width: 100%;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .login-section button:hover {
+      background: #58a73b;
+    }
+    .login-section a {
+      margin-top: 15px;
+      color: #67bf41;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    
+    .header {
+      background-color: #67bf41;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
