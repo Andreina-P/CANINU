@@ -15,7 +15,7 @@ function soloAdmin(req, res, next) {
 router.get("/", soloAdmin, async (req, res) => {
     try {
         const result = await pool.query(
-            "SELECT id, username, email, rol, fecha_creacion FROM usuarios WHERE rol = 'empleado' ORDER BY id ASC"
+            "SELECT id, username, email, rol, fecha_creacion, estado FROM usuarios WHERE rol = 'empleado' ORDER BY id ASC"
         );
         res.json({ success: true, empleados: result.rows });
 
@@ -84,7 +84,9 @@ router.delete("/:id", soloAdmin, async (req, res) => {
 
     try {
         const result = await pool.query(
-            "DELETE FROM usuarios WHERE id = $1 AND rol = 'empleado'",
+            `UPDATE usuarios
+            SET Estado = False
+            WHERE id = $1 AND rol = 'empleado';`,
             [id]
         );
 
@@ -92,13 +94,12 @@ router.delete("/:id", soloAdmin, async (req, res) => {
             return res.json({ success: false, message: "Empleado no encontrado" });
         }
 
-        res.json({ success: true, message: "Empleado eliminado" });
+        res.json({ success: true, message: "Empleado desactivado" });
 
     } catch (error) {
-        console.error("Error al eliminar empleado:", error);
+        console.error("Error al desactivar empleado:", error);
         res.status(500).json({ success: false, message: "Error interno" });
     }
 });
-
 
 export default router;

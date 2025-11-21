@@ -23,32 +23,42 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 //  CARGAR EMPLEADOS
 // ===============================
 async function cargarEmpleados() {
-    const res = await fetch("/api/empleados", { credentials: "include" });
-    const data = await res.json();
+            try {
+                const res = await fetch("/api/empleados", { credentials: "include" });
+                const data = await res.json();
 
-    if (!data.success) {
-        alert("Error al cargar empleados");
-        return;
-    }
+                if (!data.success) {
+                    alert("Error al cargar empleados");
+                    return;
+                }
 
-    const tbody = document.getElementById("empleadosTable");
-    tbody.innerHTML = "";
+                const tbody = document.getElementById("empleadosTable");
+                tbody.innerHTML = "";
 
-    data.empleados.forEach(emp => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${emp.id}</td>
-                <td>${emp.username}</td>
-                <td>${emp.email}</td>
-                <td>${emp.fecha_creacion}</td>
-                <td>
-                    <button class="btn-edit" onclick="editarEmpleado(${emp.id}, '${emp.username}', '${emp.email}')">Editar</button>
-                    <button class="btn-delete" onclick="eliminarEmpleado(${emp.id})">Eliminar</button>
-                    <button class="btn-assign" onclick="abrirAsignacion(${emp.id}, '${emp.username}')">Asignar a Cita</button>
-                </td>
-            </tr>
-        `;
-    });
+                data.empleados.forEach(emp => {
+                    const row = document.createElement("tr");
+                    const estadoHTML = emp.estado ? "Activo" : "Desactivado";
+
+                    row.innerHTML = `
+                        <td>${emp.id}</td>
+                        <td>${emp.username}</td>
+                        <td>${emp.email}</td>
+                        <td>${(emp.fecha_creacion)}</td>
+                        <td>${estadoHTML}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editarEmpleado(${emp.id}, '${emp.username}', '${emp.email}')">Editar</button>
+                            <button class="btn-delete" onclick="eliminarEmpleado(${emp.id})">Desactivar</button>
+                            <button class="btn-assign" onclick="abrirAsignacion(${emp.id}, '${emp.username}')">Asignar a Cita</button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error("Error al cargar empleados:", error);
+                alert("Ocurrió un error al cargar los empleados");
+            }
 }
 
 // ===============================
@@ -109,7 +119,7 @@ async function editarEmpleado(id, username, email) {
 //  ELIMINAR EMPLEADO
 // ===============================
 async function eliminarEmpleado(id) {
-    if (!confirm("¿Seguro que deseas eliminar este empleado?")) return;
+    if (!confirm("¿Seguro que deseas desactivar este empleado?")) return;
 
     const res = await fetch(`/api/empleados/${id}`, {
         method: "DELETE",
