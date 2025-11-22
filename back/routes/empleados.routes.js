@@ -15,7 +15,7 @@ function soloAdmin(req, res, next) {
 router.get("/", soloAdmin, async (req, res) => {
     try {
         const result = await pool.query(
-            "SELECT id, username, email, rol, fecha_creacion FROM usuarios WHERE rol = 'empleado' ORDER BY id ASC"
+            "SELECT id, username, email, rol, fecha_creacion, estado FROM usuarios WHERE rol = 'empleado' ORDER BY id ASC"
         );
         res.json({ success: true, empleados: result.rows });
 
@@ -99,6 +99,5 @@ router.delete("/:id", soloAdmin, async (req, res) => {
         res.status(500).json({ success: false, message: "Error interno" });
     }
 });
-
 
 export default router;
