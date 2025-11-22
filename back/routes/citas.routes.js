@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import * as CitasRepository from '../repositories/citas.repository.js';
-import { obtenerCitasPendientes, asignarEmpleado } from '../repositories/citas.repository.js';
+import { obtenerCitasPendientes, asignarEmpleado, findByEmpleadoId } from '../repositories/citas.repository.js';
 import { validateCitaCreation } from '../middleware/validation.middleware.js';
+// En citas.routes.js (Inicio del archivo)
+
 
 const router = Router();
 
@@ -124,6 +126,26 @@ router.put("/asignar-empleado", async (req, res) => {
     } catch (err) {
         console.error("Error en ruta:", err);
         res.status(500).json({ success: false, message: "Error interno del servidor" });
+    }
+});
+
+/* ================================
+   OBTENER CITAS ASIGNADAS AL EMPLEADO
+================================ */
+router.get('/asignadas', async (req, res) => {
+    try {
+        const id_empleado = req.id_usuario; // Obtenido del middleware verificarSesion
+
+        if (req.session.user.rol !== 'empleado') {
+             return res.status(403).json({ success: false, message: 'Acceso denegado.' });
+        }
+
+        const citas = await findByEmpleadoId(id_empleado); // Llama a la nueva función
+        
+        res.status(200).json({ success: true, data: citas });
+    } catch (error) {
+        console.error("Error al obtener citas asignadas:", error);
+        res.status(500).json({ success: false, message: 'Error interno al obtener las citas asignadas.' });
     }
 });
 

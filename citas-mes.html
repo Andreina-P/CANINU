@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citas Asignadas - CANINU</title>
+    
+    <link rel="stylesheet" href="styles2.css"> 
+    
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    
+    <style>
+        /* Estilos CSS Específicos para la página de Citas */
+        .calendar-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #calendar {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .fc-event-title {
+            font-weight: bold;
+        }
+        /* Estilo para los eventos pendientes */
+        .fc-event[style*="#ff9900"] { 
+            /* Se aplica a eventos de color naranja (#ff9900) */
+            border-left: 5px solid #cc7a00;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="Caninu.png" alt="logoEmpresa" width="100" height="100">
+            <h1>CANINU</h1>
+        </div>
+        <ol>
+            <li><a href="citas-mes.html">Citas del mes</a></li>
+            <li><a href="#">Controles del día</a></li>
+            <li><a href="#">Reportes diarios</a></li>
+        </ol>
+        <div class="user-profile">
+            <span id="usernameField">Empleado: </span>
+            <div id="CS-button"> <a href="#" id="logoutBtn">Cerrar sesión</a> </div>
+        </div>
+    </header>
+
+    <section style="padding: 10px;" class="dashboard-content">
+        <div class="dashboard-welcome">
+            <h2>📆 Citas Asignadas para el Mes</h2>
+            <div class="calendar-container">
+            <div id="calendar"></div>
+            </div>
+        </div>  
+    </section>
+
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js'></script>
+
+<script>
+    // ELIMINAR la lista 'const todasLasCitas = [...]'
+    let currentEmpleadoId = null;
+
+    // =========================================================
+    // Lógica de Sesión y Logout (Se mantiene la lógica con fallback)
+    // =========================================================
+
+    async function loadSession() {
+        const loggedUser = { 
+            logged: true, 
+            user: { username: "JuanPerez", rol: "empleado", id: 3 } 
+        };
+        let userData = loggedUser; 
+
+        try {
+            const res = await fetch("/session-info", { credentials: "include" });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.logged) {
+                    userData = data; 
+                }
+            }
+        } catch (e) {
+            console.warn("Fallo al obtener la sesión del servidor. Usando datos simulados.", e);
+        }
+
+        if (!userData.logged || userData.user.rol !== "empleado") {
+            window.location.href = "login.html";
+            return;
+        }
+
+        document.getElementById("usernameField").innerText = "Empleado: " + userData.user.username;
+        currentEmpleadoId = userData.user.id; 
+
+        // LLAMA A LA FUNCIÓN ASÍNCRONA
+        initializeCalendar(currentEmpleadoId); 
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await fetch("/logout", { credentials: "include" });
+        window.location.href = "login.html";
+    });
+
+    document.addEventListener('DOMContentLoaded', loadSession);
+
+
+    // =========================================================
+    // FUNCIÓN CLAVE 1: OBTENER DATOS REALES DEL SERVIDOR
+    // =========================================================
+
+    async function fetchCitas(empleadoId) {
+        // Endpoint que llama a la ruta que acabas de crear: /api/citas/asignadas
+        const API_URL = `/api/citas/asignadas`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'GET',
+                credentials: 'include', // Importante para enviar la cookie de sesión
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: El servidor no pudo obtener las citas.`);
+            }
+
+            const result = await response.json();
+            
+            if (result.success && result.data) {
+                return result.data; // Retorna el array de citas reales
+            }
+            return []; 
+            
+        } catch (error) {
+            console.error("Error al obtener las citas del servidor:", error);
+            alert("No se pudieron cargar las citas asignadas. Verifique su conexión y que el servidor esté corriendo.");
+            return []; 
+        }
+    }
+
+
+    // =========================================================
+    // FUNCIÓN CLAVE 2: Inicializar el Calendario (AHORA ASÍNCRONA)
+    // =========================================================
+
+    async function initializeCalendar(empleadoId) {
+        // 1. OBTENER DATOS: Llama al servidor y espera la respuesta
+        const citasEmpleado = await fetchCitas(empleadoId);
+
+        const calendarEl = document.getElementById('calendar');
+
+        // 2. Mapear los datos al formato FullCalendar
+        const eventos = citasEmpleado.map(cita => {
+            // Usa las columnas reales de la base de datos (fecha, hora)
+            const fechaBase = cita.fecha.substring(0, 10);
+            const startDateTime = `${fechaBase}T${cita.hora}`;
+
+            
+            let bgColor = '#ff9900'; 
+            if (cita.estado === 'Completada') {
+                bgColor = '#4CAF50';
+            }
+
+            return {
+                id: cita.id,
+                title: `${cita.detalle} (${cita.tipo_cita})`, 
+                start: startDateTime, 
+                allDay: false,
+                backgroundColor: bgColor,
+                borderColor: bgColor,
+                extendedProps: {
+                    estado: cita.estado,
+                    id_mascota: cita.id_mascota
+                }
+            };
+        });
+
+        // 3. Configuración y Renderizado del calendario
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth', 
+            locale: 'es', 
+            height: 'auto', 
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth'
+            },
+
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+                meridiem: 'short' 
+            },
+
+            events: eventos, // Carga de citas obtenidas
+
+            eventClick: function(info) {
+                const cita = info.event;
+                alert(`
+                    Detalle de la Cita:
+                    Tipo: ${cita.title}
+                    Fecha: ${cita.start.toLocaleDateString()}
+                    Hora: ${cita.start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    Estado: ${cita.extendedProps.estado}
+                `);
+            }
+        });
+
+        calendar.render();
+    }
+</script>
+</body>
+</html>

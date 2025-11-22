@@ -1,5 +1,6 @@
 import { pool } from '../config/db.js';
 
+
 /* ================================
    CREAR CITA
 ================================ */
@@ -127,6 +128,39 @@ export const asignarEmpleado = async (id_cita, id_empleado) => {
         return rows.length > 0 ? rows[0] : null;
     } catch (error) {
         console.error("Error en repositorio al asignar empleado:", error);
+        throw error;
+    }
+};
+
+/* ================================
+   OBTENER CITAS POR EMPLEADO (find by id_empleado)
+================================ */
+export const findByEmpleadoId = async (id_empleado) => {
+    const query = `
+        SELECT 
+            c.id, 
+            c.fecha, 
+            c.hora, 
+            c.tipo_cita, 
+            c.detalle, 
+            c.estado,
+            c.id_mascota,
+            c.id_usuario
+        FROM 
+            citas c
+        WHERE 
+            c.id_empleado = $1  -- Filtra por el id_empleado
+        ORDER BY 
+            c.fecha ASC, c.hora ASC;
+    `;
+    
+    try {
+        const { rows } = await pool.query(query, [id_empleado]);
+        // Las columnas de datos que devuelve son: 
+        // id, fecha, hora, tipo_cita, detalle, estado, id_mascota, id_usuario
+        return rows;
+    } catch (error) {
+        console.error("Error en repositorio al buscar citas por empleado:", error);
         throw error;
     }
 };
