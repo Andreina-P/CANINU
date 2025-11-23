@@ -1,4 +1,4 @@
-import {pool} from '../config/db.js';
+import {pool} from '../../config/db.js';
 
 /**
  * Desactiva (eliminación lógica) una mascota por su ID.

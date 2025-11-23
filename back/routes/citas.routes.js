@@ -1,3 +1,5 @@
+import { pool } from '../../config/db.js';
+
 import { Router } from 'express';
 import * as CitasRepository from '../repositories/citas.repository.js';
 import { obtenerCitasPendientes, asignarEmpleado, findByEmpleadoId } from '../repositories/citas.repository.js';

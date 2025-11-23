@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { pool } from '../../config/db.js';
+
 import { createPet, getPetsByUserId, deactivatePet } from '../repositories/mascotas.repository.js'; 
 
 const router = Router();

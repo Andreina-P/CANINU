@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool } from '../../config/db.js';
 
 /**
  * CREAR CITA: Inserta una nueva cita en la base de datos.

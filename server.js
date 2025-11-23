@@ -7,7 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // Importa la conexión a la base de datos (se asume que existe)
-import { pool } from './config/db.js'; 
+import { pool } from './config/db.js';
 
 // Importación de Routers
 import citasRouter from './back/routes/citas.routes.js';
@@ -42,7 +42,10 @@ app.use(
 // SERVICIO DE ARCHIVOS ESTÁTICOS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const rootPath = path.join(__dirname, "../");
+const rootPath = __dirname;
+app.use('/assets', express.static(path.join(rootPath, 'front', 'assets')));
+app.use(express.static(path.join(rootPath, 'front', 'views')));
+
 app.use(express.static(rootPath));
 
 
@@ -132,9 +135,10 @@ app.use('/api/mascotas', mascotasRouter);
 app.use("/api/empleados", empleadosRouter);
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(rootPath, "login.html"));
+    res.sendFile(path.join(rootPath, "front", "views", "login.html"));
 });
 
+// INICIO DEL SERVIDOR
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor backend en http://localhost:${PORT}`);

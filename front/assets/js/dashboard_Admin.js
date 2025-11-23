@@ -39,42 +39,73 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
  * @returns {Promise<void>}
  */
 async function cargarEmpleados() {
-            try {
-                const res = await fetch("/api/empleados", { credentials: "include" });
-                const data = await res.json();
+    try {
+        const res = await fetch("/api/empleados", { credentials: "include" });
+        const data = await res.json();
 
-                if (!data.success) {
-                    alert("Error al cargar empleados");
-                    return;
-                }
+        if (!data.success) {
+            alert("Error al cargar empleados");
+            return;
+        }
 
-                const tbody = document.getElementById("empleadosTable");
-                tbody.innerHTML = "";
+        const tbody = document.getElementById("empleadosTable");
+        tbody.innerHTML = "";
 
-                data.empleados.forEach(emp => {
-                    const row = document.createElement("tr");
-                    const estadoHTML = emp.estado ? "Activo" : "Desactivado";
+        data.empleados.forEach(emp => {
+            const row = document.createElement("tr");
+            const estadoHTML = emp.estado ? "Activo" : "Desactivado";
 
-                    row.innerHTML = `
-                        <td>${emp.id}</td>
-                        <td>${emp.username}</td>
-                        <td>${emp.email}</td>
-                        <td>${(emp.fecha_creacion)}</td>
-                        <td>${estadoHTML}</td>
-                        <td>
-                            <button class="btn-edit" onclick="editarEmpleado(${emp.id}, '${emp.username}', '${emp.email}')">Editar</button>
-                            <button class="btn-delete" onclick="eliminarEmpleado(${emp.id})">Desactivar</button>
-                            <button class="btn-assign" onclick="abrirAsignacion(${emp.id}, '${emp.username}')">Asignar a Cita</button>
-                        </td>
-                    `;
+            row.innerHTML = `
+                <td>${emp.id}</td>
+                <td>${emp.username}</td>
+                <td>${emp.email}</td>
+                <td>${(emp.fecha_creacion)}</td>
+                <td>${estadoHTML}</td>
+                <td>
+                    <button class="btn-edit" onclick="editarEmpleado(${emp.id}, '${emp.username}', '${emp.email}')">Editar</button>
+                    <button class="btn-delete" onclick="eliminarEmpleado(${emp.id})">Desactivar</button>
+                    <button class="btn-assign" onclick="abrirAsignacion(${emp.id}, '${emp.username}')">Asignar a Cita</button>
+                </td>
+            `;
 
-                    tbody.appendChild(row);
-                });
+            tbody.appendChild(row);
+        });
 
-            } catch (error) {
-                console.error("Error al cargar empleados:", error);
-                alert("Ocurrió un error al cargar los empleados");
-            }
+    } catch (error) {
+        console.error("Error al cargar empleados:", error);
+        alert("Ocurrió un error al cargar los empleados");
+    }
+}
+
+/**
+ * Maneja la lógica para editar un empleado existente.
+ * * @function editarEmpleado
+ * @param {number} id - ID del empleado a editar.
+ * @returns {void}
+ */
+async function editarEmpleado(id, username, email) {
+    const nuevoNombre = prompt("Nuevo nombre:", username);
+    if (!nuevoNombre) return;
+
+    const nuevoEmail = prompt("Nuevo email:", email);
+    if (!nuevoEmail) return;
+
+    const nuevaPass = prompt("Nueva contraseña:", "");
+
+    const res = await fetch(`/api/empleados/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username: nuevoNombre,
+            email: nuevoEmail,
+            password: nuevaPass || null
+        })
+    });
+
+    const data = await res.json();
+    alert(data.message);
+    cargarEmpleados();
 }
 
 // ===============================
@@ -103,45 +134,19 @@ document.getElementById("formCrear").addEventListener("submit", async (e) => {
     }
 });
 
-// ===============================
-//  EDITAR EMPLEADO
-// ===============================
-async function editarEmpleado(id, username, email) {
-    const nuevoNombre = prompt("Nuevo nombre:", username);
-    if (!nuevoNombre) return;
-
-    const nuevoEmail = prompt("Nuevo email:", email);
-    if (!nuevoEmail) return;
-
-    const nuevaPass = prompt("Nueva contraseña:", "");
-
-    const res = await fetch(`/api/empleados/${id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            username: nuevoNombre,
-            email: nuevoEmail,
-            password: nuevaPass || null
-        })
-    });
-
-    const data = await res.json();
-    alert(data.message);
-    cargarEmpleados();
-}
-
-// ===============================
-//  ELIMINAR EMPLEADO
-// ===============================
+/**
+ * Envía la solicitud DELETE al endpoint /api/empleados/:id para eliminar un empleado.
+ * * @async
+ * @function eliminarEmpleado
+ * @param {number} id - ID del empleado a eliminar.
+ * @returns {Promise<void>}
+ */
 async function eliminarEmpleado(id) {
     if (!confirm("¿Seguro que deseas desactivar este empleado?")) return;
-
     const res = await fetch(`/api/empleados/${id}`, {
         method: "DELETE",
         credentials: "include"
     });
-
     const data = await res.json();
     alert(data.message);
     cargarEmpleados();
@@ -149,15 +154,18 @@ async function eliminarEmpleado(id) {
 
 async function abrirAsignacion(idEmpleado, username) {
     empleadoSeleccionado = idEmpleado;
-
     document.getElementById("empSeleccionado").innerText =
         `Empleado seleccionado: ${username}`;
-
     document.getElementById("modalAsignar").style.display = "block";
-
     cargarCitas();
 }
 
+/**
+ * Carga las citas pendientes (sin empleado asignado) desde `/api/citas/citas-pendientes` y renderiza la tabla.
+ * * @async
+ * @function cargarCitas
+ * @returns {Promise<void>}
+ */
 async function cargarCitas() {
     const res = await fetch("/api/citas/citas-pendientes", { credentials: "include" });
     const data = await res.json();
@@ -183,9 +191,16 @@ async function cargarCitas() {
         </tr>
     `;
 });
-
 }
 
+/**
+ * Asigna la cita seleccionada al empleado guardado en `empleadoSeleccionado`.
+ * Envía una solicitud PUT a `/api/citas/asignar-empleado`.
+ * * @async
+ * @function asignarCita
+ * @param {number} idCita - ID de la cita a asignar.
+ * @returns {Promise<void>}
+ */
 async function asignarCita(idCita) {
     const res = await fetch("/api/citas/asignar-empleado", {
         method: "PUT",
@@ -198,14 +213,11 @@ async function asignarCita(idCita) {
     });
 
     const data = await res.json();
-
     if (data.error) {
         alert("Error: " + data.error);
         return;
     }
-
     alert("Empleado asignado correctamente");
-
     cargarCitas();
     cerrarModal();
 }

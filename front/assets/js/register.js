@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Lógica del lado del cliente para el formulario de registro.
+ * * Este script maneja el evento de envío del formulario y realiza una solicitud POST al endpoint /register.
+ */
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
