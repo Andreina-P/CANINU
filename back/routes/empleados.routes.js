@@ -3,7 +3,12 @@ import { pool } from "../config/db.js";
 
 const router = Router();
 
-
+/**
+ * Middleware para restringir el acceso solo a usuarios con rol 'admin'.
+ * * @function soloAdmin
+ * @param {object} req - Objeto de solicitud de Express.
+ * @returns {void}
+ */
 function soloAdmin(req, res, next) {
     if (!req.session.user || req.session.user.rol !== "admin") {
         return res.status(403).json({ success: false, message: "Acceso denegado" });
@@ -11,7 +16,13 @@ function soloAdmin(req, res, next) {
     next();
 }
 
-
+/**
+ * OBTENR TODOS LOS EMPLEADOS: Endpoint para obtener la lista de todos los usuarios con rol 'empleado'.
+ * Requiere autorización de administrador (`soloAdmin`).
+ * * @name GET /
+ * @function
+ * @memberof module:routes/empleados
+ */
 router.get("/", soloAdmin, async (req, res) => {
     try {
         const result = await pool.query(
@@ -25,6 +36,16 @@ router.get("/", soloAdmin, async (req, res) => {
     }
 });
 
+/**
+ * CREAR NUEVO EMPLEADO: Endpoint para registrar un nuevo usuario con rol 'empleado'.
+ * Requiere autorización de administrador (`soloAdmin`).
+ * * @name POST /
+ * @function
+ * @memberof module:routes/empleados
+ * @param {string} username - Nombre de usuario.
+ * @param {string} email - Correo electrónico (debe ser único).
+ * @param {string} password - Contraseña.
+ */
 router.post("/", soloAdmin, async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -52,7 +73,17 @@ router.post("/", soloAdmin, async (req, res) => {
     }
 });
 
-
+/**
+ * ACTUALIZAR EMPLEADO: Endpoint para actualizar la información de un empleado existente.
+ * Requiere autorización de administrador (`soloAdmin`).
+ * * @name PUT /:id
+ * @function
+ * @memberof module:routes/empleados
+ * @param {number} id - ID del empleado a actualizar (en params).
+ * @param {string} username - Nuevo nombre de usuario.
+ * @param {string} email - Nuevo correo electrónico.
+ * @param {string} password - Nueva contraseña.
+ */
 router.put("/:id", soloAdmin, async (req, res) => {
     const { id } = req.params;
     const { username, email, password } = req.body;
@@ -77,8 +108,14 @@ router.put("/:id", soloAdmin, async (req, res) => {
     }
 });
 
-
-
+/**
+ * ELIMINAR EMPLEADO: Endpoint para eliminar un empleado por su ID.
+ * Requiere autorización de administrador (`soloAdmin`).
+ * * @name DELETE /:id
+ * @function
+ * @memberof module:routes/empleados
+ * @param {number} id - ID del empleado a eliminar (en params).
+ */
 router.delete("/:id", soloAdmin, async (req, res) => {
     const { id } = req.params;
 

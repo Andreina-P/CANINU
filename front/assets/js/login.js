@@ -1,3 +1,7 @@
+/**
+ * Agrega un listener al evento 'submit' del formulario de inicio de sesión.
+ * * @listens submit
+ */
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 

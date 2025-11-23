@@ -1,3 +1,6 @@
+/* ==================================
+   ESTILOS GENERALES DEL BODY
+================================== */
 body {
       font-family: Inter, system-ui, Arial;
       background: #fff;
@@ -7,6 +10,9 @@ body {
       justify-content: center;
     }
 
+/* ==================================
+   ESTILOS DE LA SECCIÓN DE LOGIN
+================================== */
     .login-section {
       flex-direction: column;
       display: flex;
@@ -67,6 +73,9 @@ body {
       font-weight: bold;
     }
     
+/* ==================================
+  ESTILOS DEL ENCABEZADO (HEADER)
+================================== */
     .header {
       background-color: #67bf41;
       display: flex;

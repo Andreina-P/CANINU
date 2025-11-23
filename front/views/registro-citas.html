@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CANINU - Agendar Cita</title>
-    <link rel="stylesheet" href="../styles2.css">
+    <link rel="stylesheet" href="/assets/css/styles2.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -158,13 +158,13 @@
 <body>
     <header>
         <div class="logo">
-            <img src="../Caninu.png" alt="logoEmpresa" width="100" height="100">
+            <img src="/assets/images/Caninu.png" alt="logoEmpresa" width="100" height="100">
             <h1>CANINU</h1>
         </div>
         <ol>
-            <li><a href="../dashboard.html">Inicio</a></li>
+            <li><a href="/dashboard.html">Inicio</a></li>
             <li><a href="#">Agendar Cita</a></li>
-            <li><a href="mascota.html">Mascotas</a></li>
+            <li><a href="/mascota.html">Mascotas</a></li>
         </ol>
         <div class="user-profile">
             <span id="usernameField">Usuario: </span>
@@ -267,7 +267,10 @@
     </div>
 
     <script>
-        // --- Gestión de Sesión ---
+        /**
+         * @async
+         * Verifica la sesión del usuario (Ruta: GET /session-info) y redirige si no está logueado.
+         */
         async function loadSession() {
             const res = await fetch("/session-info", { credentials: "include" });
             const data = await res.json();
@@ -279,12 +282,19 @@
             return true;
         }
 
+        /**
+         * Manejador de evento para cerrar sesión.
+         * RUTA: POST /logout
+         */
         document.getElementById("logoutBtn").addEventListener("click", async () => {
             await fetch("/logout", { credentials: "include" });
             window.location.href = "login.html";
         });
 
-        // --- Lógica del Formulario Dinámico ---
+        /**
+         * Logica de mascotas y horarios
+         * Muestra u oculta los campos de selección de servicio, fecha y horario.
+         */
         function mostrarCampos() {
             const tipo = document.getElementById('tipoCita').value;
             const grupoMedico = document.getElementById('grupoMedico');
@@ -310,7 +320,11 @@
             }
         }
         
-        // --- NUEVA FUNCIÓN: Cargar Mascotas ---
+        /**
+         * @async
+         * Obtiene y carga las mascotas del usuario logueado en el selector.
+         * RUTA: GET /api/mascotas/mis-mascotas
+         */
         async function cargarMascotas() {
             try {
                 const response = await fetch("/api/mascotas/mis-mascotas", {

@@ -1,9 +1,12 @@
 import { pool } from '../config/db.js';
 
-
-/* ================================
-   CREAR CITA
-================================ */
+/**
+ * CREAR CITA: Inserta una nueva cita en la base de datos.
+ * * @async
+ * @function create
+ * @returns {Promise<object>} El objeto de la cita recién creada con el ID asignado.
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
+ */
 export const create = async (citaData) => {
     const { fecha, hora, tipoCita, detalle, id_usuario, idMascota } = citaData;
     
@@ -24,9 +27,12 @@ export const create = async (citaData) => {
     }
 };
 
-/* ================================
-   VERIFICAR CITA DUPLICADA
-================================ */
+/**
+ * VERIFICAR CITA DUPLICADA: Busca si ya existe una cita para una mascota en una fecha y hora específicas.
+ * @function findByPetAndDateTime
+ * @returns {Promise<object|undefined>} El objeto de la cita encontrada (con solo el ID) o undefined si no existe.
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
+ */
 export const findByPetAndDateTime = async (id_mascota, fecha, hora) => {
     const query = `
         SELECT id FROM citas 
@@ -42,9 +48,12 @@ export const findByPetAndDateTime = async (id_mascota, fecha, hora) => {
     }
 };
 
-/* ================================
-   OBTENER CITAS POR USUARIO
-================================ */
+/**
+ * OBTENR CITAS POR USUARIO: Obtiene todas las citas de un usuario específico, incluyendo el nombre de la mascota.
+ * @function findByUserId
+ * @returns {Promise<Array<object>>} Un array de objetos de citas.
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
+ */
 export const findByUserId = async (id_usuario) => {
     const query = `
         SELECT 
@@ -74,9 +83,12 @@ export const findByUserId = async (id_usuario) => {
     }
 };
 
-/* ================================
-   ELIMINAR CITA
-================================ */
+/**
+ * ELIMINAR CITA: Elimina una cita específica, verificando que pertenezca al usuario que intenta borrarla.
+ * @function deleteById
+ * @returns {Promise<boolean>} Retorna true si se eliminó una fila, false si no se encontró o no pertenecía al usuario.
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
+ */
 export const deleteById = async (id_cita, id_usuario) => {
     const query = `
         DELETE FROM citas 
@@ -93,9 +105,12 @@ export const deleteById = async (id_cita, id_usuario) => {
     }
 };
 
-/* ================================
-   CITAS QUE NO TIENEN EMPLEADO
-================================ */
+/**
+ * CITAS QUE NO TIENEN EMPLEADO: Obtiene todas las citas que aún no tienen un empleado (veterinario/estilista) asignado.
+ * @function obtenerCitasPendientes
+ * @returns {Promise<Array<object>>} Un array de objetos de citas pendientes.
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
+ */
 export const obtenerCitasPendientes = async () => {
     const query = `
         SELECT *
@@ -112,9 +127,12 @@ export const obtenerCitasPendientes = async () => {
     }
 };
 
-/* ================================
-   ASIGNAR EMPLEADO A UNA CITA
-================================ */
+/**
+ * ASIGNAR EMPLEADO A UNA CITA: Actualiza una cita para asignarle un empleado específico.
+ * @function asignarEmpleado
+ * @returns {Promise<object|null>} El objeto de la cita actualizada, o null si no se encontró la cita.
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
+ */
 export const asignarEmpleado = async (id_cita, id_empleado) => {
     const query = `
         UPDATE citas 
@@ -132,9 +150,12 @@ export const asignarEmpleado = async (id_cita, id_empleado) => {
     }
 };
 
-/* ================================
-   OBTENER CITAS POR EMPLEADO (find by id_empleado)
-================================ */
+/**
+ * CITAS ASIGNADAS A UN EMPLEADO: Obtiene todas las citas asignadas a un empleado específico.
+ * @function findByEmpleadoId
+ * @returns {Promise<Array<object>>} Un array de objetos de citas asignadas al empleado.
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
+ */
 export const findByEmpleadoId = async (id_empleado) => {
     const query = `
         SELECT 

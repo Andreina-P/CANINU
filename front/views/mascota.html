@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CANINU - Mis Mascotas</title>
-    <link rel="stylesheet" href="../styles2.css">
+    <link rel="stylesheet" href="/assets/css/styles2.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -216,13 +216,13 @@
 <body>
     <header>
         <div class="logo">
-            <img src="../Caninu.png" alt="logoEmpresa" width="100" height="100">
+            <img src="/assets/images/Caninu.png" alt="logoEmpresa" width="100" height="100">
             <h1>CANINU</h1>
         </div>
         <ol>
-            <li><a href="../dashboard.html">Inicio</a></li>
-            <li><a href="registro-citas.html">Agendar Cita</a></li>
-            <li><a href="#">Mascotas</a></li>
+            <li><a href="/dashboard.html">Inicio</a></li>
+            <li><a href="/registro-citas.html">Agendar Cita</a></li>
+            <li><a href="/mascota.html">Mascotas</a></li>
         </ol>
         <div class="user-profile">
             <span id="usernameField">Usuario: </span>
@@ -234,15 +234,12 @@
         <div class="page-title">
             <h1 class="main-title">Mis Mascotas</h1>
         </div>
-
-        
-        
         <div class="content-container">
             
             <div id="loadingSpinner" class="spinner"></div>
             <div id="mascotasList"></div>
             <div>
-            <a href="registro-mascota.html" class="btn-new-mascota">
+            <a href="/registro-mascota.html" class="btn-new-mascota">
                 <i class="fas fa-plus-circle"></i> Registrar Nueva Mascota
             </a>
         </div>
@@ -251,7 +248,11 @@
     </div>
 
     <script>
-        // --- GESTIÓN DE SESIÓN ---
+        /**
+         * Gestión de inicio de sesión
+         * Verifica la sesión del usuario (Ruta: GET /session-info) y redirige si no está logueado.
+         * @returns {Promise<boolean>} Estado de la sesión.
+         */
         async function loadSession() {
             const res = await fetch("/session-info", { credentials: "include" });
             const data = await res.json();
@@ -263,7 +264,10 @@
             return true;
         }
 
-        // Función para manejar la desactivación y enviar la solicitud PUT
+        /**
+         * Manejador de evento para el botón de desactivación de mascota.
+         * RUTA: PUT /api/mascotas/deactivate/:mascotaId
+         */
         async function handleDeactivateClick(event) {
             // Usa closest para manejar clics dentro del icono o texto del botón
             const button = event.target.closest('.btn-deactivate');
@@ -303,6 +307,10 @@
             }
         }
 
+        /**
+         * Manejador de evento para cerrar sesión.
+         * RUTA: POST /logout
+         */
         document.getElementById("logoutBtn").addEventListener("click", async () => {
             await fetch("/logout", { credentials: "include" });
             window.location.href = "login.html";
@@ -321,7 +329,11 @@
             }
         });
         
-        // --- LÓGICA DE CARGA DE MASCOTAS ---
+        /**
+         * Logica de Carga de Mascotas
+         * Obtiene la lista de mascotas del usuario y las renderiza.
+         * RUTA: GET /api/mascotas/mis-mascotas
+         */
         async function cargarMascotas() {
             const listContainer = document.getElementById('mascotasList');
             const loadingSpinner = document.getElementById('loadingSpinner');
@@ -363,7 +375,11 @@
             }
         }
         
-        // Función para crear el elemento HTML de la tarjeta
+        /**
+         * Crea el elemento HTML (tarjeta) para una mascota.
+         * @param {Object} mascota - Objeto con datos de la mascota.
+         * @returns {HTMLElement} Tarjeta div de la mascota.
+         */
         function crearTarjetaMascota(mascota) {
             const card = document.createElement('div');
             card.className = 'mascota-card';
@@ -395,7 +411,6 @@
             `;
             return card;
         }
-
 
         // --- CARGA INICIAL ---
         document.addEventListener("DOMContentLoaded", async () => {

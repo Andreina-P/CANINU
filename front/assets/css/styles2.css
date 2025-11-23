@@ -1,3 +1,6 @@
+/* ==================================
+   ESTILOS GENERALES DEL BODY
+================================== */
 body {
     margin: 0;
     padding: 0;
@@ -7,6 +10,9 @@ body {
     overflow-x: hidden;
 }
 
+/* ==================================
+   ESTILOS DEL ENCABEZADO (HEADER) y Navegación
+================================== */
 header {
     background-color: #ace793;
     display: flex;
@@ -44,6 +50,9 @@ header ol li a {
     padding: 20px;
 }
 
+/* ==================================
+   CONTENIDO PRINCIPAL DEL DASHBOARD
+================================== */
 .dashboard-content {
     display: flex;
     align-items: center;
@@ -70,6 +79,9 @@ header ol li a {
     margin-left: 100px;
 }
 
+/* ==================================
+   ESTILOS DE PERFIL DE USUARIO Y BOTONES
+================================== */
 .user-profile {
     display: flex;
     align-items: center;
@@ -109,7 +121,9 @@ header ol li a {
     transform: translateY(-2px);
 }
 
-/*Ver citas*/
+/* ==================================
+   SECCIÓN DE PREVISUALIZACIÓN DE CITAS
+================================== */
 .citas-preview {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
@@ -129,7 +143,6 @@ header ol li a {
     padding-bottom: 15px;
 }
 
-/* Contenedor de las tarjetas */
 #citas-container-preview {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -137,7 +150,6 @@ header ol li a {
     margin-bottom: 30px;
 }
 
-/* Tarjeta de Cita */
 .cita-card {
     background: #ffffff;
     border-radius: 15px;
@@ -197,6 +209,10 @@ header ol li a {
     padding: 20px;
     grid-column: 1 / -1;
 }
+
+/* ==================================
+   ESTILOS GENERALES DE CRUD y TABLAS
+================================== */
 .crud-container {
     background: #fff;
     padding: 20px;

@@ -2,9 +2,10 @@ import {pool} from '../config/db.js';
 
 /**
  * Desactiva (eliminación lógica) una mascota por su ID.
- * Establece la columna 'activo' a FALSE.
- * @param {number} mascotaId - ID de la mascota a desactivar.
- * @returns {number} El número de filas afectadas (debería ser 1).
+ * Establece la columna 'activo' a FALSE para que ya no aparezca.
+ * @function deactivatePet
+ * @returns {Promise<number>} El número de filas afectadas (debería ser 1 si la mascota existe).
+ * @throws {Error} Si ocurre un error durante la ejecución de la consulta.
  */
 export async function deactivatePet(mascotaId) { // <<-- YA ESTÁ DEFINIDA
     const query = `

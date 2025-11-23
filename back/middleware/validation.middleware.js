@@ -1,6 +1,15 @@
 import { body, validationResult } from 'express-validator';
 
-// Función genérica que maneja los errores de validación
+/**
+ * Función middleware que maneja los errores de validación.
+ * Si validationResult(req) encuentra errores, detiene la ejecución
+ * y responde con un JSON 400. Si no hay errores, llama a next().
+ * * @function handleValidationErrors
+ * @param {object} req - Objeto de solicitud de Express.
+ * @param {object} res - Objeto de respuesta de Express.
+ * @param {function} next - Función para pasar al siguiente middleware/controlador.
+ * @returns {void}
+ */
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -14,7 +23,14 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
+// Define la fecha máxima permitida para las citas (2 años en el futuro)
 const maxDate = new Date();
+
+/**
+ * Conjunto de reglas de validación para el endpoint de creación de citas.
+ * Se exporta como un array de middlewares que se ejecutan en secuencia.
+ * * @type {Array<Function>}
+ */
 maxDate.setFullYear(maxDate.getFullYear() + 2); // 2 años en el futuro
 // Reglas específicas para la creación de una cita
 export const validateCitaCreation = [

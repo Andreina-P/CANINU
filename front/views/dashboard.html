@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard CANINU - Usuario</title>
-    <link rel="stylesheet" href="styles2.css">
+    <link rel="stylesheet" href="/assets/css/styles2.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,7 +12,7 @@
 <body>
     <header>
         <div class="logo">
-            <img src="Caninu.png" alt="logoEmpresa" width="100" height="100">
+            <img src="/assets/images/Caninu.png" alt="logoEmpresa" width="100" height="100">
             <h1>CANINU</h1>
         </div>
         <ol>
@@ -32,7 +32,7 @@
             <h2>Bienvenido al Dashboard de CANINU</h2>
             <p>Desde aquí puedes gestionar las citas y las mascotas registradas.</p>
         </div>
-        <img src="R.png" alt="Dashboard Image">
+        <img src="/assets/images/R.png" alt="Dashboard Image">
 
         <div class="citas-preview">
             <h2>Tus Próximas Citas</h2>
@@ -44,6 +44,12 @@
     </section>
 
     <script>
+        /**
+         * Lógica de Sesión y Logout
+         * Verifica el estado de la sesión con el servidor (Ruta: GET /session-info).
+         * Si el usuario no está logueado, redirige a login.html.
+         * @returns {Promise<boolean>} Retorna true si está logueado.
+         */
         async function loadSession() {
             const res = await fetch("/session-info", { credentials: "include" });
             const data = await res.json();
@@ -57,12 +63,19 @@
             return true; // Devuelve true si está logueado
         }
 
+        /**
+         * Manejador de evento para cerrar sesión.
+         * RUTA: POST /logout (Llama al endpoint de cierre de sesión).
+         */
         document.getElementById("logoutBtn").addEventListener("click", async () => {
             await fetch("/logout", { credentials: "include" });
             window.location.href = "login.html";
         });
 
-        // --- Cargar Vista Previa de Citas ---
+        /**
+         * Lógica de Carga de Citas
+         * Obtiene y renderiza una vista previa de las 3 próximas citas del usuario.
+         */
         async function cargarCitasPreview() {
             try {
                 // 1. Usamos el mismo endpoint que 'mis-citas.html'

@@ -1,20 +1,17 @@
-// back/controllers/mascota.controller.js
+import { createPet, getPetsByUserId } from '../repositories/mascotas.repository.js';
 
-// Asume que la función protect añade req.usuario.id
-// Asume que el repositorio tiene la función createPet
-import { createPet, getPetsByUserId } from '../repositories/mascotas.repository.js'; 
-// import { validationResult } from 'express-validator'; // Para usar con el middleware
-
-export const createPetController = async (req, res) => {
-    // Si usas express-validator:
-    /*
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
-    }
-    */
-    
+/**
+ * Controlador para el registro de una nueva mascota.
+ * Requiere que el usuario esté autenticado (req.usuario.id).
+ * * @async
+ * @function createPetController
+ * @param {object} req - Objeto de solicitud de Express. Se espera { nombre, especie, ... } en req.body.
+ * @param {object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Envía una respuesta HTTP 201 si es exitoso o 400/500 si falla.
+ */
+export const createPetController = async (req, res) => {   
     try {
+        // Asume que el middleware de autenticación (protect) añade req.usuario.id
         const data = req.body;
         const userId = req.usuario.id; 
 
@@ -41,9 +38,21 @@ export const createPetController = async (req, res) => {
     }
 };
 
+/**
+ * Controlador para obtener todas las mascotas asociadas al usuario autenticado.
+ * Requiere que el usuario esté autenticado (req.usuario.id).
+ * * @async
+ * @function getMyPetsController
+ * @param {object} req - Objeto de solicitud de Express.
+ * @param {object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Envía una respuesta HTTP 200 con el listado de mascotas o 500 si falla.
+ */
 export const getMyPetsController = async (req, res) => {
     try {
+        // Asume que el middleware de autenticación (protect) añade req.usuario.id
         const userId = req.usuario.id;
+
+        // 1. Llama a la función del repositorio para obtener las mascotas
         const mascotas = await getPetsByUserId(userId);
         res.status(200).json({ success: true, data: mascotas });
     } catch (error) {

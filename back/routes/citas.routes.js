@@ -2,12 +2,15 @@ import { Router } from 'express';
 import * as CitasRepository from '../repositories/citas.repository.js';
 import { obtenerCitasPendientes, asignarEmpleado, findByEmpleadoId } from '../repositories/citas.repository.js';
 import { validateCitaCreation } from '../middleware/validation.middleware.js';
-// En citas.routes.js (Inicio del archivo)
-
 
 const router = Router();
 
-// Middleware para verificar sesión
+/**
+ * Middleware para verificar si existe una sesión de usuario válida.
+ * Si la sesión es válida, añade el ID del usuario a `req.id_usuario` para su uso posterior.
+ * * @function verificarSesion
+ * @returns {void}
+ */
 const verificarSesion = (req, res, next) => {
     if (!req.session.user || !req.session.user.id) {
         return res.status(401).json({ success: false, message: 'No autorizado. Debe iniciar sesión.' });
@@ -18,9 +21,14 @@ const verificarSesion = (req, res, next) => {
 
 router.use(verificarSesion);
 
-/* ================================
-   CREAR CITA
-================================ */
+/**
+ * CREAR CITA:Endpoint para crear una nueva cita.
+ * Aplica el middleware de validación `validateCitaCreation`.
+ * Además, verifica si ya existe una cita para la misma mascota en la misma fecha/hora.
+ * * @name POST /
+ * @function
+ * @memberof module:routes/citas
+ */
 router.post('/', validateCitaCreation, async (req, res) => {
     try {
         const { fecha, hora, idMascota } = req.body;
@@ -52,9 +60,12 @@ router.post('/', validateCitaCreation, async (req, res) => {
     }
 });
 
-/* ================================
-   OBTENER MIS CITAS
-================================ */
+/**
+ * OBTENER CITA: Endpoint para obtener todas las citas del usuario autenticado.
+ * * @name GET /mis-citas
+ * @function
+ * @memberof module:routes/citas
+ */
 router.get('/mis-citas', async (req, res) => {
     try {
         const citas = await CitasRepository.findByUserId(req.id_usuario);
@@ -64,9 +75,13 @@ router.get('/mis-citas', async (req, res) => {
     }
 });
 
-/* ================================
-   ELIMINAR CITA
-================================ */
+/**
+ * ELIMINAR CITA: Endpoint para eliminar (cancelar) una cita.
+ * Verifica que la cita pertenezca al usuario autenticado antes de eliminar.
+ * * @name DELETE /:id
+ * @function
+ * @memberof module:routes/citas
+ */
 router.delete('/:id', async (req, res) => {
     try {
         const id_cita = req.params.id;
@@ -82,9 +97,12 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-/* ================================
-   OBTENER CITAS PENDIENTES (SIN EMPLEADO)
-================================ */
+/**
+ * OBTENER CITAS PENDIENTES (SIN EMPLEADO): Endpoint para obtener citas que no tienen empleado asignado. (Uso para Administrador/Empleado).
+ * * @name GET /citas-pendientes
+ * @function
+ * @memberof module:routes/citas
+ */
 router.get("/citas-pendientes", async (req, res) => {
     try {
         const citas = await obtenerCitasPendientes();
@@ -100,9 +118,14 @@ router.get("/citas-pendientes", async (req, res) => {
     }
 });
 
-/* ================================
-   ASIGNAR EMPLEADO A CITA
-================================ */
+/**
+ * ASIGNAR EMPLEADO A CITA: Endpoint para asignar un empleado a una cita específica. (Uso para Administrador).
+ * * @name PUT /asignar-empleado
+ * @function
+ * @memberof module:routes/citas
+ * @param {number} id_empleado - ID del empleado a asignar.
+ * @param {number} id_cita - ID de la cita a actualizar.
+ */
 router.put("/asignar-empleado", async (req, res) => {
     try {
         const { id_empleado, id_cita } = req.body;
@@ -129,9 +152,13 @@ router.put("/asignar-empleado", async (req, res) => {
     }
 });
 
-/* ================================
-   OBTENER CITAS ASIGNADAS AL EMPLEADO
-================================ */
+/**
+ * OBTENER CITAS ASIGNADAS AL EMPLEADO: Endpoint para obtener las citas asignadas al empleado autenticado.
+ * Requiere que el usuario tenga el rol de 'empleado'.
+ * * @name GET /asignadas
+ * @function
+ * @memberof module:routes/citas
+ */
 router.get('/asignadas', async (req, res) => {
     try {
         const id_empleado = req.id_usuario; // Obtenido del middleware verificarSesion

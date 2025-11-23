@@ -1,9 +1,17 @@
 import { Router } from 'express';
-
 import { createPet, getPetsByUserId, deactivatePet } from '../repositories/mascotas.repository.js'; 
 
 const router = Router();
 
+/**
+ * Middleware para verificar si existe una sesión de usuario válida.
+ * Si es exitoso, añade el ID del usuario a `req.id_usuario`.
+ * * @function verificarSesion
+ * @param {object} req - Objeto de solicitud de Express.
+ * @param {object} res - Objeto de respuesta de Express.
+ * @param {function} next - Función para pasar al siguiente middleware/controlador.
+ * @returns {void}
+ */
 const verificarSesion = (req, res, next) => {
     if (!req.session.user || !req.session.user.id) {
         return res.status(401).json({ success: false, message: 'No autorizado.' });
@@ -14,7 +22,11 @@ const verificarSesion = (req, res, next) => {
 router.use(verificarSesion);
 
 /**
- * Desactiva (eliminación lógica) una mascota por su ID.
+ * DESACTIVAR MASCOTA: Endpoint para desactivar (eliminación lógica) una mascota por su ID.
+ * * @name PUT /deactivate/:id
+ * @function
+ * @memberof module:routes/mascotas
+ * @param {string} :id - ID de la mascota a desactivar (en params).
  */
 router.put('/deactivate/:id', async (req, res) => {
     try {
@@ -35,7 +47,11 @@ router.put('/deactivate/:id', async (req, res) => {
 });
 
 /**
- * Crea una nueva mascota.
+ * CREAR MASCOTA: Endpoint para crear una nueva mascota asociada al usuario autenticado.
+ * * @name POST /
+ * @function
+ * @memberof module:routes/mascotas
+ * @param {object} req.body - Datos de la mascota (nombre, especie, sexo, etc.).
  */
 router.post('/', async (req, res) => {
     try {
@@ -59,8 +75,12 @@ router.post('/', async (req, res) => {
     }
 });
 
-// GET /api/mascotas/mis-mascotas
-// Se actualiza para usar getPetsByUserId
+/**
+ * OBTENER MASCOTAS: Endpoint para obtener la lista de mascotas activas del usuario autenticado.
+ * * @name GET /mis-mascotas
+ * @function
+ * @memberof module:routes/mascotas
+ */
 router.get('/mis-mascotas', async (req, res) => {
     try {
         const mascotas = await getPetsByUserId(req.id_usuario);
@@ -75,7 +95,7 @@ router.get('/mis-mascotas', async (req, res) => {
 /**
  * Controlador de desactiva una mascota.
  */
-export const deactivatePetController = async (req, res) => {
+/**export const deactivatePetController = async (req, res) => {
     try {
         // El ID de la mascota viene en los parámetros de la URL
         const mascotaId = req.params.id; 
@@ -99,5 +119,5 @@ export const deactivatePetController = async (req, res) => {
         res.status(500).json({ success: false, message: "Error interno del servidor al desactivar la mascota." });
     }
 };
-
+ */
 export default router;

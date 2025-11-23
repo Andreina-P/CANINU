@@ -1,5 +1,13 @@
 let empleadoSeleccionado = null;
 
+/**
+ * SESIÓN Y AUTENTICACIÓN: Carga la información de la sesión del usuario.
+ * Redirige a login.html si no está autenticado o si no tiene rol 'admin'.
+ * Si es admin, actualiza el nombre de usuario en el DOM y llama a cargarEmpleados.
+ * * @async
+ * @function loadSession
+ * @returns {Promise<void>}
+ */
 async function loadSession() {
     const res = await fetch("/session-info", { credentials: "include" });
     const data = await res.json();
@@ -14,14 +22,22 @@ async function loadSession() {
     cargarEmpleados();
 }
 
+/**
+ * Agrega el listener para el botón de cerrar sesión.
+ * Cierra la sesión en el backend y redirige a login.html.
+ * * @listens click
+ */
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     await fetch("/logout", { credentials: "include" });
     window.location.href = "login.html";
 });
 
-// ===============================
-//  CARGAR EMPLEADOS
-// ===============================
+/**
+ * CARGAR EMPLEADOS: Carga la lista de empleados desde la API y renderiza la tabla.
+ * * @async
+ * @function cargarEmpleados
+ * @returns {Promise<void>}
+ */
 async function cargarEmpleados() {
             try {
                 const res = await fetch("/api/empleados", { credentials: "include" });

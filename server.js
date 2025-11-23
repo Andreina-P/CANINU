@@ -6,22 +6,26 @@ import bodyParser from "body-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// Importa la conexión a la base de datos (se asume que existe)
 import { pool } from './config/db.js'; 
 
-import citasRouter from './routes/citas.routes.js';
-import mascotasRouter from './routes/mascotas.routes.js';
-import empleadosRouter from "./routes/empleados.routes.js";
+// Importación de Routers
+import citasRouter from './back/routes/citas.routes.js';
+import mascotasRouter from './back/routes/mascotas.routes.js';
+import empleadosRouter from "./back/routes/empleados.routes.js";
 
 dotenv.config();
 
 const app = express();
 
+// MIDDLEWARE DE CONFIGURACIÓN
 app.use(cors({
   origin: "http://localhost:3000",
   credentials: true
 }));
 app.use(bodyParser.json());
 
+// CONFIGURACIÓN DE SESIÓN (express-session)
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "Serena", 
@@ -35,13 +39,14 @@ app.use(
   })
 );
 
+// SERVICIO DE ARCHIVOS ESTÁTICOS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootPath = path.join(__dirname, "../");
 app.use(express.static(rootPath));
 
 
-
+// POST /register: Registro de nuevos usuarios (Clientes)
 app.post("/register", async (req, res) => {
     const { nombre, email, password } = req.body;
 
@@ -71,6 +76,7 @@ app.post("/register", async (req, res) => {
     }
 });
 
+// POST /login: Validación de credenciales y creación de sesión
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
@@ -105,11 +111,13 @@ app.post("/login", async (req, res) => {
     }
 });
 
+// GET /session-info: Devuelve la información de la sesión activa
 app.get("/session-info", (req, res) => {
     if (!req.session.user) return res.status(401).json({ logged: false });
     res.json({ logged: true, user: req.session.user });
 });
 
+// GET /logout: Destruye la sesión
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
         res.json({ success: true });

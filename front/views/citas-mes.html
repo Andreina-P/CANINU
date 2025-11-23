@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citas Asignadas - CANINU</title>
     
-    <link rel="stylesheet" href="styles2.css"> 
+    <link rel="stylesheet" href="/assets/css/styles2.css"> 
     
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     
@@ -62,13 +62,19 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js'></script>
 
 <script>
-    // ELIMINAR la lista 'const todasLasCitas = [...]'
+    /**
+     * @fileoverview Script para inicializar y configurar FullCalendar con citas del usuario.
+     * * Obtiene las citas asignadas desde el endpoint /api/citas/asignadas.
+         */
     let currentEmpleadoId = null;
 
-    // =========================================================
-    // Lógica de Sesión y Logout (Se mantiene la lógica con fallback)
-    // =========================================================
-
+    /**
+     * @async
+     * Carga la información de la sesión del usuario.
+     * 1. Intenta obtener la sesión del servidor (Ruta: GET /session-info).
+     * 2. Si no hay sesión válida o el rol no es 'empleado', redirige a login.html.
+     * 3. Si la sesión es válida, actualiza el nombre del empleado e inicializa el calendario.
+     */
     async function loadSession() {
         const loggedUser = { 
             logged: true, 
@@ -100,6 +106,10 @@
         initializeCalendar(currentEmpleadoId); 
     }
 
+    /**
+     * Listener para el botón de Cerrar sesión.
+     * Llama al endpoint de logout en el servidor y redirige a la página de login.
+     */
     document.getElementById("logoutBtn").addEventListener("click", async () => {
         await fetch("/logout", { credentials: "include" });
         window.location.href = "login.html";
@@ -107,11 +117,12 @@
 
     document.addEventListener('DOMContentLoaded', loadSession);
 
-
-    // =========================================================
-    // FUNCIÓN CLAVE 1: OBTENER DATOS REALES DEL SERVIDOR
-    // =========================================================
-
+    /**
+     * FUNCIÓN CLAVE 1: OBTENER DATOS REALES DEL SERVIDOR (FETCH)
+     * Obtiene la lista de citas asignadas al empleado desde el API.
+     * @param {number} empleadoId - El ID del empleado logueado (actualmente no se usa en la ruta, se asume sesión).
+     * @returns {Promise<Array>} Un array de objetos de cita.
+     */
     async function fetchCitas(empleadoId) {
         // Endpoint que llama a la ruta que acabas de crear: /api/citas/asignadas
         const API_URL = `/api/citas/asignadas`;
@@ -143,11 +154,14 @@
         }
     }
 
-
-    // =========================================================
-    // FUNCIÓN CLAVE 2: Inicializar el Calendario (AHORA ASÍNCRONA)
-    // =========================================================
-
+    /**
+     * FUNCIÓN CLAVE 2: INICIALIZAR Y RENDERIZAR CALENDARIO
+     * Inicializa y renderiza el componente FullCalendar.
+     * 1. Llama a fetchCitas() para obtener los datos del servidor.
+     * 2. Mapea los datos de las citas al formato de eventos de FullCalendar.
+     * 3. Configura y renderiza el calendario en la interfaz.
+     * @param {number} empleadoId - El ID del empleado logueado.
+     */
     async function initializeCalendar(empleadoId) {
         // 1. OBTENER DATOS: Llama al servidor y espera la respuesta
         const citasEmpleado = await fetchCitas(empleadoId);
