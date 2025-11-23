@@ -2,7 +2,7 @@ import { pool } from '../../config/db.js';
 
 import { Router } from 'express';
 import * as CitasRepository from '../repositories/citas.repository.js';
-import { obtenerCitasPendientes, asignarEmpleado, findByEmpleadoId } from '../repositories/citas.repository.js';
+import { obtenerCitasPendientes, asignarEmpleado, findByEmpleadoId, update } from '../repositories/citas.repository.js';
 import { validateCitaCreation } from '../middleware/validation.middleware.js';
 
 const router = Router();
@@ -18,6 +18,7 @@ const verificarSesion = (req, res, next) => {
         return res.status(401).json({ success: false, message: 'No autorizado. Debe iniciar sesión.' });
     }
     req.id_usuario = req.session.user.id;
+    req.rol_usuario = req.session.user.rol; 
     next();
 };
 
@@ -175,6 +176,33 @@ router.get('/asignadas', async (req, res) => {
     } catch (error) {
         console.error("Error al obtener citas asignadas:", error);
         res.status(500).json({ success: false, message: 'Error interno al obtener las citas asignadas.' });
+    }
+});
+
+/**EDITAR CITA (Empleado cambia estado/observaciones) */
+router.put('/:id', async (req, res) => {
+    try {
+        const id_cita = req.params.id;
+        const { estado, observaciones } = req.body;
+
+        // Seguridad: Solo empleados pueden editar el estado médico
+        if (req.rol_usuario !== 'empleado') {
+            return res.status(403).json({ success: false, message: 'No tienes permiso para editar citas.' });
+        }
+
+        // Llamamos a la función update que creamos en el repo
+        // Pasamos solo estado y observaciones. Si alguno no viene (undefined), el repo lo ignorará.
+        const citaActualizada = await update(id_cita, { estado, observaciones });
+
+        if (citaActualizada) {
+            res.status(200).json({ success: true, message: 'Cita actualizada.', data: citaActualizada });
+        } else {
+            res.status(404).json({ success: false, message: 'Cita no encontrada.' });
+        }
+
+    } catch (error) {
+        console.error("Error actualizando cita:", error);
+        res.status(500).json({ success: false, message: 'Error interno al actualizar la cita.' });
     }
 });
 

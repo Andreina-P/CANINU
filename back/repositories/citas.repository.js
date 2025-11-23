@@ -165,23 +165,55 @@ export const findByEmpleadoId = async (id_empleado) => {
             c.tipo_cita, 
             c.detalle, 
             c.estado,
+            c.observaciones,
             c.id_mascota,
-            c.id_usuario
+            c.id_usuario,
+            m.nombre AS nombre_mascota,   -- Traemos el nombre de la tabla mascotas
+            u.username AS nombre_cliente  -- Traemos el nombre de la tabla usuarios
         FROM 
             citas c
+        JOIN 
+            mascotas m ON c.id_mascota = m.id
+        JOIN 
+            usuarios u ON c.id_usuario = u.id
         WHERE 
-            c.id_empleado = $1  -- Filtra por el id_empleado
+            c.id_empleado = $1  
         ORDER BY 
             c.fecha ASC, c.hora ASC;
     `;
     
     try {
         const { rows } = await pool.query(query, [id_empleado]);
-        // Las columnas de datos que devuelve son: 
-        // id, fecha, hora, tipo_cita, detalle, estado, id_mascota, id_usuario
         return rows;
     } catch (error) {
         console.error("Error en repositorio al buscar citas por empleado:", error);
+        throw error;
+    }
+};
+
+/**
+ * ACTUALIZAR CITA (Estado y Observaciones)
+ * Usa COALESCE para actualizar solo lo que enviemos, manteniendo lo demás igual.
+ */
+export const update = async (id_cita, updateData) => {
+    const { estado, observaciones } = updateData;
+    
+    const query = `
+        UPDATE citas
+        SET 
+            estado = COALESCE($1, estado),
+            observaciones = COALESCE($2, observaciones)
+        WHERE id = $3
+        RETURNING *;
+    `;
+    
+    const values = [estado, observaciones, id_cita];
+
+    try {
+        const { rows } = await pool.query(query, values);
+        return rows[0]; // Devuelve la cita actualizada o undefined
+    } catch (error) {
+        console.error("Error actualizando cita:", error);
         throw error;
     }
 };
