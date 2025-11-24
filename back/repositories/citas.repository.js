@@ -135,11 +135,20 @@ export const obtenerCitasPendientes = async () => {
  */
 export const asignarEmpleado = async (id_cita, id_empleado) => {
     const query = `
-        UPDATE citas 
-        SET id_empleado = $1
-        WHERE id = $2
-        RETURNING *;
+    UPDATE citas
+    SET id_empleado = $1
+    WHERE id = $2
+      AND NOT EXISTS (
+        SELECT 1
+        FROM citas c2
+        WHERE c2.id_empleado = $1
+          AND c2.fecha = (SELECT fecha FROM citas WHERE id = $2)
+          AND c2.hora = (SELECT hora FROM citas WHERE id = $2)
+          AND c2.id <> $2
+      )
+    RETURNING *;
     `;
+
 
     try {
         const { rows } = await pool.query(query, [id_empleado, id_cita]);
