@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CANINU - Agendar Cita</title>
+    <link rel="stylesheet" href="/assets/css/styles2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%);
+            /* Tonos más suaves */
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Contenedor principal */
+        .agenda-content {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            /* Añadido margen superior */
+            width: 100%;
+        }
+
+        /* Título de la página */
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2d3748;
+            /* Color oscuro para contraste */
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        /* Contenedor del Formulario */
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Grid del formulario */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            /* Una sola columna */
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(74, 144, 226, 0.2);
+            border-radius: 15px;
+            font-size: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            color: #2d3748;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Botón de Guardar */
+        .btn-guardar {
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-guardar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(45, 55, 72, 0.4);
+            background: linear-gradient(135deg, #1a202c, #2d3748);
+        }
+
+        /* Mensaje de éxito */
+        .success-message {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="/assets/images/Caninu.png" alt="logoEmpresa" width="100" height="100">
+            <h1>CANINU</h1>
+        </div>
+        <ol>
+            <li><a href="/dashboard.html">Inicio</a></li>
+            <li><a href="#">Agendar Cita</a></li>
+            <li><a href="/mascota.html">Mascotas</a></li>
+        </ol>
+        <div class="user-profile">
+            <span id="usernameField">Usuario: </span>
+            <div id="CS-button"> <a href="#" id="logoutBtn">Cerrar sesión</a> </div>
+        </div>
+    </header>
+
+    <div class="agenda-content">
+        <!-- Título de la página -->
+        <div class="page-title">
+            <h1 class="main-title">Agendar Cita</h1>
+            <p class="subtitle">Completa los datos para tu próxima visita</p>
+        </div>
+
+        <!-- Contenedor del Formulario -->
+        <div class="form-container">
+
+            <div id="successMessage" class="success-message">
+                <i class="fas fa-check-circle"></i>
+                ¡Cita agendada exitosamente!
+            </div>
+
+            <form id="agendarCitaForm">
+                <div class="form-grid">
+
+                    <!-- Fecha -->
+                    <div class="form-group">
+                        <label class="form-label">Fecha:</label>
+                        <input type="date" class="form-input" id="fechaCita" required>
+                    </div>
+
+                    <!-- Hora -->
+                    <div class="form-group">
+                        <label class="form-label">Hora:</label>
+                        <select class="form-select" id="horaCita" required>
+                            <option value="">Seleccionar hora</option>
+                            <option value="08:00">08:00 AM</option>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                            <option value="17:00">05:00 PM</option>
+                        </select>
+                    </div>
+
+                    <!-- Seleccionar mascota -->
+                    <div class="form-group">
+                        <label class="form-label">Seleccionar mascota:</label>
+                        <select class="form-select" id="mascotaSelect" required>
+                            <option value="">Seleccionar mascota</option>
+                            <option value="1">Mascota Ejemplo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Cita:</label>
+                        <select class="form-select" id="tipoCita" required onchange="mostrarCampos()">
+                            <option value="">Seleccione el tipo...</option>
+                            <option value="Medico">Consulta Médica</option>
+                            <option value="Estetico">Estética y Aseo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="grupoMedico" style="display: none;">
+                        <label class="form-label">Motivo de consulta:</label>
+                        <select class="form-select" id="motivoMedico">
+                            <option value="">Seleccione el síntoma/motivo...</option>
+                            <option value="Consulta General">Consulta General / Revisión</option>
+                            <option value="Vacunación">Vacunación</option>
+                            <option value="Desparasitación">Desparasitación</option>
+                            <option value="Vómitos / Diarrea">Vómitos / Diarrea</option>
+                            <option value="Problemas de Piel">Problemas de Piel</option>
+                            <option value="Cojea / Dolor">Cojea / Dolor</option>
+                            <option value="Apatía / No come">Apatía / No come</option>
+                            <option value="Otro">Otro (se especificará en consulta)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="grupoEstetico" style="display: none;">
+                        <label class="form-label">Servicio deseado:</label>
+                        <select class="form-select" id="servicioEstetico">
+                            <option value="">Seleccione el servicio...</option>
+                            <option value="Baño Completo">Baño Completo</option>
+                            <option value="Corte de Pelo">Corte de Pelo</option>
+                            <option value="Corte de Uñas">Corte de Uñas</option>
+                            <option value="Limpieza Dental">Limpieza Dental</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn-guardar">
+                    <i class="fas fa-save"></i> Guardar cita
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * @async
+         * Verifica la sesión del usuario (Ruta: GET /session-info) y redirige si no está logueado.
+         */
+        async function loadSession() {
+            const res = await fetch("/session-info", { credentials: "include" });
+            const data = await res.json();
+            if (!data.logged) {
+                window.location.href = "login.html";
+                return false;
+            }
+            document.getElementById("usernameField").innerText = "Usuario: " + data.user.username;
+            return true;
+        }
+
+        /**
+         * Manejador de evento para cerrar sesión.
+         * RUTA: POST /logout
+         */
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            await fetch("/logout", { credentials: "include" });
+            window.location.href = "login.html";
+        });
+
+        /**
+         * Logica de mascotas y horarios
+         * Muestra u oculta los campos de selección de servicio, fecha y horario.
+         */
+        function mostrarCampos() {
+            const tipo = document.getElementById('tipoCita').value;
+            const grupoMedico = document.getElementById('grupoMedico');
+            const grupoEstetico = document.getElementById('grupoEstetico');
+            const inputMedico = document.getElementById('motivoMedico');
+            const inputEstetico = document.getElementById('servicioEstetico');
+
+            if (tipo === 'Medico') {
+                grupoMedico.style.display = 'block';
+                grupoEstetico.style.display = 'none';
+                inputMedico.required = true;
+                inputEstetico.required = false;
+            } else if (tipo === 'Estetico') {
+                grupoMedico.style.display = 'none';
+                grupoEstetico.style.display = 'block';
+                inputMedico.required = false;
+                inputEstetico.required = true;
+            } else {
+                grupoMedico.style.display = 'none';
+                grupoEstetico.style.display = 'none';
+                inputMedico.required = false;
+                inputEstetico.required = false;
+            }
+        }
+        
+        /**
+         * @async
+         * Obtiene y carga las mascotas del usuario logueado en el selector.
+         * RUTA: GET /api/mascotas/mis-mascotas
+         */
+        async function cargarMascotas() {
+            try {
+                const response = await fetch("/api/mascotas/mis-mascotas", {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (!result.success) throw new Error(result.message);
+
+                const selectMascota = document.getElementById('mascotaSelect');
+                selectMascota.innerHTML = '<option value="">Seleccionar mascota</option>'; // Limpiar
+
+                if (result.data.length === 0) {
+                     selectMascota.innerHTML = '<option value="">No tienes mascotas registradas</option>';
+                     selectMascota.disabled = true;
+                } else {
+                    result.data.forEach(mascota => {
+                        const option = document.createElement('option');
+                        option.value = mascota.id;
+                        option.textContent = mascota.nombre;
+                        selectMascota.appendChild(option);
+                    });
+                    selectMascota.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error al cargar mascotas:', error);
+                document.getElementById('mascotaSelect').innerHTML = '<option value="">Error al cargar</option>';
+            }
+        }
+
+
+        // --- Carga inicial ---
+        document.addEventListener("DOMContentLoaded", async () => {
+            const isLoggedIn = await loadSession();
+            
+            if (isLoggedIn) {
+                // Poner fecha mínima
+                const hoy = new Date().toISOString().split('T')[0];
+                document.getElementById('fechaCita').min = hoy;
+
+                // --- CARGAR MASCOTAS AL INICIAR ---
+                await cargarMascotas();
+
+                // Manejador del envío
+                document.getElementById('agendarCitaForm').addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    // --- DATOS DEL FORMULARIO ACTUALIZADOS ---
+                    const fecha = document.getElementById('fechaCita').value;
+                    const hora = document.getElementById('horaCita').value;
+                    const tipoCita = document.getElementById('tipoCita').value;
+                    const idMascota = document.getElementById('mascotaSelect').value; // CAMBIO
+                    
+                    let detalle = "";
+                    if (tipoCita === 'Medico') {
+                        detalle = document.getElementById('motivoMedico').value;
+                    } else if (tipoCita === 'Estetico') {
+                        detalle = document.getElementById('servicioEstetico').value;
+                    }
+
+                    // Validación
+                    if (!fecha || !hora || !tipoCita || !detalle || !idMascota) {
+                        alert("Por favor complete todos los campos, incluyendo la mascota.");
+                        return;
+                    }
+
+                    const formData = { fecha, hora, tipoCita, detalle, idMascota }; // CAMBIO
+
+                    try {
+                        // --- ENDPOINT ACTUALIZADO ---
+                        const response = await fetch("/api/citas/", { // Ruta base /api/citas/ con POST
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
+                            body: JSON.stringify(formData)
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            const successMessage = document.getElementById('successMessage');
+                            successMessage.style.display = 'flex';
+                            successMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                            document.getElementById('agendarCitaForm').reset();
+                            mostrarCampos();
+                            
+                            setTimeout(() => {
+                                successMessage.style.display = 'none';
+                                alert("¡Cita agendada exitosamente!");
+                            }, 2000);
+
+                        } else {
+                            alert("Error: " + result.message);
+                        }
+
+                    } catch (error) {
+                        console.error("Error:", error);
+                        alert("Hubo un error de conexión.");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

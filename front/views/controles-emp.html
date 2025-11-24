@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controles Diarios - CANINU</title>
+    <link rel="stylesheet" href="/assets/css/styles2.css"> 
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- ESTILOS BASE --- */
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            padding: 40px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-header h2 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .date-badge {
+            background: #2d3748;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 1rem;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* --- GRID DE TARJETAS --- */
+        #citas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .cita-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border-left: 7px solid #cbd5e0; 
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column; /* Para alinear botones al final */
+        }
+
+        .cita-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .estado-pendiente { border-left-color: #f6e05e; }
+        .estado-encurso { border-left-color: #4299e1; }
+        .estado-realizada { border-left-color: #48bb78; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .card-time {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #2d3748;
+        }
+        .card-status {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 10px;
+            background: #edf2f7;
+            color: #718096;
+        }
+
+        .card-body h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+            color: #2d3748;
+        }
+        .card-body p {
+            margin: 5px 0;
+            color: #718096;
+            font-size: 0.95rem;
+        }
+        .card-body .owner {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 15px;
+        }
+
+        /* Botón Principal (Atender) */
+        .btn-atender {
+            width: 100%;
+            padding: 12px;
+            background: #48bb78; 
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: auto; /* Empuja hacia abajo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-atender:hover { background: #38a169; }
+        
+        .btn-disabled {
+            background: #cbd5e0;
+            color: #4a5568; /* Gris oscuro para que se lea */
+            cursor: not-allowed;
+        }
+
+        .btn-detalles {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 2px solid #4299e1;
+            color: #4299e1;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn-detalles:hover {
+            background: #ebf8ff;
+        }
+
+        /* --- PANEL LATERAL --- */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .side-panel {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 400px;
+            max-width: 90%;
+            height: 100vh;
+            background: white;
+            z-index: 999;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+            padding: 40px;
+            box-sizing: border-box;
+            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-active { right: 0; }
+        .overlay-active { display: block; opacity: 1; }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+        .btn-close-panel {
+            background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #a0aec0;
+        }
+
+        .panel-info-group { margin-bottom: 25px; }
+        .panel-label { display: block; font-size: 0.85rem; color: #718096; font-weight: 600; margin-bottom: 5px; }
+        .panel-value { font-size: 1.1rem; color: #2d3748; font-weight: 500; }
+
+        .observaciones-area {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            resize: none;
+            margin-top: 10px;
+        }
+        .observaciones-area:focus { outline: none; border-color: #4299e1; }
+        
+        /* Estilo cuando el area de texto está deshabilitada */
+        .observaciones-area:disabled {
+            background-color: #f7fafc;
+            color: #718096;
+            border-color: #cbd5e0;
+        }
+
+        .btn-guardar-panel {
+            background: #2d3748;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: auto; 
+        }
+        .btn-guardar-panel:hover { background: #1a202c; }
+
+        #no-citas-msg { text-align: center; color: #4a5568; font-size: 1.2rem; grid-column: 1/-1; padding: 40px; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="/assets/images/Caninu.png" alt="logoEmpresa" width="100" height="100">
+            <h1>CANINU</h1>
+        </div>
+        <ol>
+            <li><a href="dashboard_Empleados.html">Dashboard</a></li>
+            <li><a href="citas-mes.html">Citas del mes</a></li>
+            <li><a href="#">Reportes</a></li>
+        </ol>
+        <div class="user-profile">
+            <span id="usernameField">Empleado</span>
+            <div id="CS-button"> <a href="#" id="logoutBtn">Cerrar sesión</a> </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+        <div class="page-header">
+            <h2>Controles del Día</h2>
+            <span class="date-badge" id="fechaHoy">Cargando fecha...</span>
+        </div>
+
+        <div id="citas-grid">
+            <div class="spinner" style="margin: 0 auto;"></div>
+        </div>
+    </div>
+
+    <!-- PANEL LATERAL -->
+    <div class="overlay" id="overlay" onclick="cerrarPanel()"></div>
+    <div class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <h3 id="panel-title">Detalles de Atención</h3>
+            <button class="btn-close-panel" onclick="cerrarPanel()">&times;</button>
+        </div>
+
+        <input type="hidden" id="panel-id-cita">
+
+        <div class="panel-info-group">
+            <span class="panel-label">MASCOTA</span>
+            <div class="panel-value" id="panel-mascota">...</div>
+        </div>
+
+        <div class="panel-info-group">
+            <span class="panel-label">SERVICIO / SÍNTOMAS</span>
+            <div class="panel-value" id="panel-motivo">...</div>
+        </div>
+
+        <div class="panel-info-group">
+            <span class="panel-label">OBSERVACIONES DEL ESPECIALISTA</span>
+            <textarea class="observaciones-area" id="panel-observaciones" placeholder="Escriba aquí los detalles del procedimiento..."></textarea>
+        </div>
+
+        <button class="btn-guardar-panel" id="btnGuardarPanel" onclick="guardarAtencion()">
+            <i class="fas fa-check-circle"></i> Finalizar y Guardar
+        </button>
+    </div>
+
+    <script>
+        // --- 1. SESIÓN ---
+        const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('fechaHoy').innerText = new Date().toLocaleDateString('es-ES', opcionesFecha);
+
+        async function loadSession() {
+            const res = await fetch("/session-info", { credentials: "include" });
+            const data = await res.json();
+            
+            if (!data.logged || (data.user.rol !== 'empleado' && data.user.rol !== 'admin')) {
+                window.location.href = "login.html";
+                return;
+            }
+            document.getElementById("usernameField").innerText = "Hola, " + data.user.username;
+            return true;
+        }
+
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            await fetch("/logout", { credentials: "include" });
+            window.location.href = "login.html";
+        });
+
+        // --- 2. CARGA DE CITAS ---
+        async function cargarCitasDeHoy() {
+            const container = document.getElementById('citas-grid');
+            container.innerHTML = '<p style="text-align:center">Cargando...</p>';
+
+            try {
+                const response = await fetch('/api/citas/asignadas', { credentials: 'include' });
+                const result = await response.json();
+
+                if (!result.success) throw new Error("Error al cargar");
+
+                // Filtrar solo citas de hoy
+                const hoyString = new Date().toLocaleDateString('en-CA');
+                const citasHoy = result.data.filter(cita => cita.fecha.startsWith(hoyString));
+
+                container.innerHTML = ''; 
+
+                if (citasHoy.length === 0) {
+                    container.innerHTML = `
+                        <div id="no-citas-msg">
+                            <i class="fas fa-calendar-check fa-3x" style="color:#cbd5e0; margin-bottom:15px;"></i><br>
+                            No tienes citas programadas para hoy (${hoyString}).
+                        </div>`;
+                    return;
+                }
+
+                citasHoy.forEach(cita => {
+                    // Estado y Estilos
+                    let estadoClass = 'estado-pendiente';
+                    let btnText = 'Atender Cita';
+                    let btnDisabled = '';
+                    let btnIcon = 'user-md';
+
+                    // Lógica del botón PRINCIPAL (Verde/Gris)
+                    if (cita.estado === 'En curso') {
+                        estadoClass = 'estado-encurso';
+                        btnText = 'Continuar Atención';
+                        btnIcon = 'notes-medical';
+                    } else if (cita.estado === 'Realizada') {
+                        estadoClass = 'estado-realizada';
+                        btnText = 'Atención Finalizada';
+                        // Aplicamos la clase para texto gris oscuro
+                        btnDisabled = 'disabled class="btn-atender btn-disabled"'; 
+                        btnIcon = 'check';
+                    }
+
+                    const horaSimple = cita.hora.substring(0, 5);
+
+                    const card = document.createElement('div');
+                    card.className = `cita-card ${estadoClass}`;
+                    
+                    // Botón principal: Si ya está realizada, no hace nada (disabled)
+                    // Si está pendiente/en curso, llama a iniciarAtencion()
+                    const btnPrincipal = `<button ${btnDisabled ? btnDisabled : 'class="btn-atender"'} onclick='iniciarAtencion(${JSON.stringify(cita)})'>
+                                            <i class="fas fa-${btnIcon}"></i> ${btnText}
+                                          </button>`;
+
+                    // Botón detalles: Siempre visible, llama a verDetalles()
+                    const btnDetalles = `<button class="btn-detalles" onclick='verDetalles(${JSON.stringify(cita)})'>
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                         </button>`;
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span class="card-time">${horaSimple}</span>
+                            <span class="card-status">${cita.estado}</span>
+                        </div>
+                        <div class="card-body">
+                            <h3>${cita.nombre_mascota}</h3>
+                            <p class="owner"><i class="fas fa-user"></i> ${cita.nombre_cliente}</p>
+                            <p><strong>Tipo:</strong> ${cita.tipo_cita}</p>
+                            <p><strong>Detalle:</strong> ${cita.detalle}</p>
+                        </div>
+                        ${btnPrincipal}
+                        ${btnDetalles} 
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<p>Error cargando citas.</p>';
+            }
+        }
+
+        // --- 3. LÓGICA DEL PANEL ---
+
+        // Función común para mostrar el panel
+        function mostrarPanel(cita, soloLectura) {
+            // 1. Llenar datos
+            document.getElementById('panel-id-cita').value = cita.id;
+            document.getElementById('panel-mascota').innerText = cita.nombre_mascota;
+            document.getElementById('panel-motivo').innerText = cita.detalle;
+            
+            const obsArea = document.getElementById('panel-observaciones');
+            obsArea.value = cita.observaciones || '';
+            
+            const btnGuardar = document.getElementById('btnGuardarPanel');
+            const titulo = document.getElementById('panel-title');
+
+            // 2. Configurar modo (Lectura vs Edición)
+            if (soloLectura) {
+                titulo.innerText = "Detalles de la Cita";
+                obsArea.disabled = true;       // Bloquear texto
+                btnGuardar.style.display = 'none'; // Ocultar botón guardar
+            } else {
+                titulo.innerText = "Registrar Atención";
+                obsArea.disabled = false;      // Habilitar texto
+                btnGuardar.style.display = 'block'; // Mostrar botón guardar
+            }
+
+            // 3. Mostrar
+            document.getElementById('overlay').classList.add('overlay-active');
+            document.getElementById('sidePanel').classList.add('panel-active');
+        }
+
+        // Acción del botón VERDE (Atender)
+        async function iniciarAtencion(cita) {
+            // Si está pendiente, cambiamos a "En curso" automáticamente
+            if (cita.estado === 'Pendiente') {
+                try {
+                    await fetch(`/api/citas/${cita.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ estado: 'En curso' }),
+                        credentials: 'include'
+                    });
+                } catch (e) {
+                    console.error("Error cambiando estado", e);
+                }
+            }
+            // Abrir panel en modo EDICIÓN (soloLectura = false)
+            mostrarPanel(cita, false);
+        }
+
+        // Acción del botón AZUL (Ver Detalles)
+        function verDetalles(cita) {
+            // Abrir panel en modo LECTURA (soloLectura = true)
+            mostrarPanel(cita, true);
+        }
+
+        function cerrarPanel() {
+            document.getElementById('sidePanel').classList.remove('panel-active');
+            document.getElementById('overlay').classList.remove('overlay-active');
+            setTimeout(cargarCitasDeHoy, 300); // Recargar para ver cambios de estado
+        }
+
+        async function guardarAtencion() {
+            const idCita = document.getElementById('panel-id-cita').value;
+            const observaciones = document.getElementById('panel-observaciones').value;
+
+            if (!observaciones.trim()) {
+                alert("Por favor, escribe una observación.");
+                return;
+            }
+
+            if (!confirm("¿Finalizar atención?")) return;
+
+            try {
+                const response = await fetch(`/api/citas/${idCita}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        estado: 'Realizada',
+                        observaciones: observaciones 
+                    }),
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert("Guardado correctamente.");
+                    cerrarPanel();
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error de conexión.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (await loadSession()) {
+                cargarCitasDeHoy();
+            }
+        });
+
+    </script>
+</body>
+</html>
