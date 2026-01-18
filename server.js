@@ -6,6 +6,14 @@ import bodyParser from "body-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
+dotenv.config(); // Asegúrate que esto esté al inicio
+
+console.log("---- DEPURACIÓN DE CONEXIÓN ----");
+console.log("Usuario:", process.env.DB_USER);
+console.log("Clave:", process.env.DB_PASSWORD);
+console.log("Base de datos:", process.env.DB_DATABASE);
+console.log("--------------------------------");
+
 // Importa la conexión a la base de datos (se asume que existe)
 import { pool } from './config/db.js';
 

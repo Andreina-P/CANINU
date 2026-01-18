@@ -217,3 +217,35 @@ export const update = async (id_cita, updateData) => {
         throw error;
     }
 };
+
+/**
+ * OBTENER HISTORIAL POR MASCOTA: Obtiene citas con observaciones y estado.
+ * Se filtra por mascota y usuario por seguridad.
+ */
+export const findHistoryByPetId = async (id_mascota, id_usuario) => {
+    const query = `
+        SELECT 
+            c.id, 
+            c.fecha, 
+            c.hora, 
+            c.tipo_cita, 
+            c.detalle, 
+            c.observaciones, 
+            c.estado
+        FROM 
+            citas c
+        WHERE 
+            c.id_mascota = $1 
+            AND c.id_usuario = $2
+        ORDER BY 
+            c.fecha DESC, c.hora DESC;
+    `;
+
+    try {
+        const { rows } = await pool.query(query, [id_mascota, id_usuario]);
+        return rows;
+    } catch (error) {
+        console.error("Error obteniendo historial médico:", error);
+        throw error;
+    }
+};

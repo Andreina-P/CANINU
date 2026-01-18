@@ -17,7 +17,7 @@ async function loadSession() {
         return;
     }
 
-    document.getElementById("usernameField").innerText = "Admin: " + data.user.username;
+    document.getElementById("usernameField").innerText = "Bienvenido: " + data.user.username;
 
     cargarEmpleados();
 }

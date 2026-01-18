@@ -10,15 +10,6 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- ESTILOS BASE (Copiados de registro-citas.html) --- */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
 
         .agenda-content {
             flex: 1;
@@ -87,7 +78,7 @@
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #4A90E2; /* Borde de color */
+            border-left: 5px solid #2E7D32; /* Borde de color */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -107,7 +98,7 @@
 
         .card-title i {
             margin-right: 10px;
-            color: #4A90E2;
+            color: #2E7D32;
         }
 
         .card-info {
@@ -164,7 +155,7 @@
         
         /* Botón principal de "Crear nueva mascota" */
         .btn-new-mascota {
-            background: linear-gradient(135deg, #4A90E2, #2c5282);
+            background: linear-gradient(135deg, #2E7D32, #2E7D32);
             box-sizing: border-box;
             color: white;
             padding: 20px 20px;
@@ -200,7 +191,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border-left-color: #4A90E2;
+            border-left-color: #2E7D32;
             animation: spin 1s ease infinite;
             margin: 50px auto;
         }
@@ -210,6 +201,63 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Estilos para el Modal de Historial */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; top: 0;
+            width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%; 
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover { color: #000; }
+        /* Tabla dentro del modal */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .history-table th {
+            background-color: #f8f9fa;
+            color: #2d3748;
+        }
+        .obs-cell {
+            font-style: italic;
+            color: #555;
+            background-color: #fffaf0; /* Fondo ligero para resaltar observaciones */
+        }
     </style>
 </head>
 
@@ -247,6 +295,29 @@
         </div>
     </div>
 
+    <div id="historialModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="cerrarModal()">&times;</span>
+            <h2 style="color: #2d3748; margin-top: 0;">Historial Médico</h2>
+            <h4 id="nombreMascotaHistorial" style="color: #2E7D32; margin-bottom: 15px;"></h4>
+        
+            <div style="overflow-x: auto;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Motivo</th>
+                            <th style="width: 40%;">Observaciones / Evolución</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaHistorialBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
         /**
          * Gestión de inicio de sesión
@@ -260,7 +331,7 @@
                 window.location.href = "login.html";
                 return false;
             }
-            document.getElementById("usernameField").innerText = "Usuario: " + data.user.username;
+            document.getElementById("usernameField").innerText = "Bienvenido: " + data.user.username;
             return true;
         }
 
@@ -374,6 +445,92 @@
                 loadingSpinner.style.display = 'none'; // Ocultar spinner
             }
         }
+
+        // ==========================================
+        //  LÓGICA DEL MODAL DE HISTORIAL MÉDICO
+        // ==========================================
+
+        /**
+         * Abre el modal y carga el historial de la mascota seleccionada.
+         */
+        async function verHistorial(idMascota, nombreMascota) {
+            const modal = document.getElementById('historialModal');
+            const titulo = document.getElementById('nombreMascotaHistorial');
+            const tbody = document.getElementById('tablaHistorialBody');
+    
+            // 1. Mostrar modal
+           modal.style.display = "block";
+            titulo.innerText = "Paciente: " + nombreMascota;
+    
+            // 2. Mostrar mensaje de carga
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center"><div class="spinner" style="margin:10px auto; width:20px; height:20px;"></div>Cargando evolución...</td></tr>';
+
+            try {
+                // 3. Pedir datos al backend
+        const response = await fetch(`/api/citas/historial/${idMascota}`, { credentials: 'include' });
+        const result = await response.json();
+
+                tbody.innerHTML = ''; // Limpiar mensaje de carga
+                // 4. Validar si hay datos
+                if (!result.success || result.data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding: 30px; color: #718096;">
+                                <i class="fas fa-notes-medical fa-2x" style="margin-bottom:10px"></i><br>
+                                No hay historial médico registrado para esta mascota.
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                // 5. Llenar la tabla
+                result.data.forEach(cita => {
+                    const fecha = new Date(cita.fecha).toLocaleDateString();
+                    // Si no hay observaciones, mostrar texto por defecto
+                    const observaciones = cita.observaciones 
+                        ? cita.observaciones 
+                        : '<span style="color:#aaa; font-style:italic">Sin observaciones</span>';
+            
+                    // Color de estado
+                    let colorEstado = '#eee';
+                    if(cita.estado === 'Realizada' || cita.estado === 'ATENDIDA') colorEstado = '#c6f6d5'; // Verde claro
+
+                    const row = `
+                        <tr>
+                            <td>
+                                <strong>${fecha}</strong><br>
+                                <small>${cita.hora.substring(0, 5)}</small><br>
+                                <span style="font-size:0.75rem; background:${colorEstado}; padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block;">
+                                    ${cita.estado}
+                                </span>
+                            </td>
+                            <td>${cita.tipo_cita}</td>
+                            <td>${cita.detalle}</td>
+                            <td class="obs-cell" style="background-color: #fffaf0;">${observaciones}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+
+            } catch (error) {
+                console.error("Error:", error);
+                tbody.innerHTML = '<tr><td colspan="4" style="color:red; text-align:center">Ocurrió un error al cargar el historial.</td></tr>';
+            }
+        }
+
+        /**
+         * Cierra la ventana modal
+         */
+        function cerrarModal() {
+            document.getElementById('historialModal').style.display = "none";
+        }
+        // Cerrar modal si se hace clic fuera del contenido blanco
+        window.onclick = function(event) {
+            const modal = document.getElementById('historialModal');
+           if (event.target == modal) {
+               cerrarModal();
+           }
+        }
         
         /**
          * Crea el elemento HTML (tarjeta) para una mascota.
@@ -383,16 +540,17 @@
         function crearTarjetaMascota(mascota) {
             const card = document.createElement('div');
             card.className = 'mascota-card';
-            
+    
             // Icono basado en especie
             let icon = mascota.especie.toLowerCase().includes('perro') ? 'dog' :
-                       mascota.especie.toLowerCase().includes('gato') ? 'cat' : 'paw';
+                    mascota.especie.toLowerCase().includes('gato') ? 'cat' : 'paw';
 
             // Formato de fecha
             const fechaNac = mascota.fecha_nacimiento ? 
                 new Date(mascota.fecha_nacimiento).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : 
                 'Desconocida';
-            
+    
+            // AQUI ESTA EL CAMBIO: Agregamos el botón de Historial junto al de Desactivar
             card.innerHTML = `
                 <h3 class="card-title">
                     <i class="fas fa-${icon}"></i> ${mascota.nombre}
@@ -402,12 +560,17 @@
                 <p class="card-info"><strong>Sexo:</strong> ${mascota.sexo || 'N/A'}</p>
                 <p class="card-info"><strong>Peso:</strong> ${mascota.peso || 'N/A'}</p>
                 <p class="card-info"><strong>Nacimiento:</strong> ${fechaNac}</p>
+        
                 <div class="card-actions">
+                    <button type="button" class="btn-action" style="background-color: #2E7D32; color: white; margin-right: 10px;" 
+                        onclick="verHistorial(${mascota.id}, '${mascota.nombre}')">
+                        <i class="fas fa-file-medical"></i> Historial
+                    </button>
+
                     <button type="button" class="btn-action btn-deactivate" data-mascota-id="${mascota.id}" data-mascota-nombre="${mascota.nombre}">
                         <i class="fas fa-trash-alt"></i> Desactivar
                     </button>
                 </div>
-               
             `;
             return card;
         }

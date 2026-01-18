@@ -10,15 +10,6 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%);
-            /* Tonos más suaves */
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
 
         /* Contenedor principal */
         .agenda-content {
@@ -278,7 +269,7 @@
                 window.location.href = "login.html";
                 return false;
             }
-            document.getElementById("usernameField").innerText = "Usuario: " + data.user.username;
+            document.getElementById("usernameField").innerText = "Bienvenido: " + data.user.username;
             return true;
         }
 

@@ -5,21 +5,34 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #c3e5eb 0%, #a4d4a6 100%);
+    
+    /* AQUI ESTÁ LA MAGIA: */
+    /* Capa 1: Un filtro blanco semitransparente (0.9) para que el texto se lea bien */
+    /* Capa 2: La imagen de fondo que guardaste */
+    background: linear-gradient(rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),
+                url('/assets/images/fondo-vet.png');
+    
+    /* Configuración para que se vea como un patrón */
+    background-repeat: repeat;       /* Repetir la imagen como mosaico */
+    background-size: 400px;          /* Ajusta este número para hacer los dibujos más grandes o chicos */
+    background-attachment: fixed;    /* El fondo se queda quieto mientras haces scroll */
+    
     min-height: 100vh;
     overflow-x: hidden;
 }
-
 /* ==================================
-   ESTILOS DEL ENCABEZADO (HEADER) y Navegación
+   ESTILOS DEL ENCABEZADO (HEADER)
 ================================== */
 header {
-    background-color: #ace793;
+    /* CAMBIO AQUÍ: Verde más oscuro (Forest Green) */
+    background-color: #2E7D32; 
+    
     display: flex;
     justify-content: space-between;
     align-items: center;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0 20px; /* Asegura un poco de espacio a los lados */
 }
 
 header .logo {
@@ -29,8 +42,12 @@ header .logo {
 }
 
 .logo h1 {
-    color: darkslategrey;
+    color: #ffffff;
     margin-left: 10px;
+}
+
+.logo img {
+    filter: brightness(0) invert(1); 
 }
 
 header ol {
@@ -45,9 +62,13 @@ header ol li {
 
 header ol li a {
     text-decoration: none;
-    color: darkslategrey;
+    color: #ffffff;
     font-weight: bold;
     padding: 20px;
+}
+
+header ol li a:hover {
+    opacity: 0.8;
 }
 
 /* ==================================
@@ -61,10 +82,16 @@ header ol li a {
     gap: 100px;
 }
 
-.dashboard-welcome h2 {
-    color: darkgreen;
-    font-size: 50px;
-    font-weight: 900;
+.dashboard-welcome h2, 
+.page-header h2, 
+.main-title {
+    color: #2E7D32; /* El mismo verde del header para consistencia */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 25px;
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.5); /* Pequeño brillo para resaltar sobre el fondo */
 }
 
 .dashboard-welcome p {
@@ -89,15 +116,14 @@ header ol li a {
 }
 
 #usernameField {
-    background-color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    padding: 8px 15px;
-    border-radius: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    font-weight: 600;
-    color: #2d3748;
-    font-size: 0.9rem;
+    background-color: transparent !important; /* Quita el fondo blanco */
+    border: none !important;                  /* Quita el borde */
+    box-shadow: none !important;              /* Quita la sombra */
+    color: #ffffff !important;                /* Texto blanco puro */
+    font-weight: 700;                         /* Negrita */
+    font-size: 1rem;
+    margin-right: 15px;
+    padding: 0;                               /* Quita el relleno extra */
 }
 
 #logoutBtn {
@@ -114,10 +140,32 @@ header ol li a {
     box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
 }
 
-#logoutBtn:hover {
-    background-color: #d00000;
+/* ==================================
+   ESTILOS DE BOTÓN CERRAR SESIÓN
+================================== */
+#logoutBtn {
+    display: inline-block;
+    padding: 8px 15px;
+    
+    /* CAMBIO AQUÍ: Fondo Negro */
+    background-color: #000000; 
+    
     color: white;
-    box-shadow: 0 6px 12px rgba(208, 0, 0, 0.4);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#logoutBtn:hover {
+    /* CAMBIO AQUÍ: Gris oscuro al pasar el mouse */
+    background-color: #333333; 
+    
+    color: white;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     transform: translateY(-2px);
 }
 

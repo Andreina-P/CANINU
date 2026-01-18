@@ -2,7 +2,7 @@ import { pool } from '../../config/db.js';
 
 import { Router } from 'express';
 import * as CitasRepository from '../repositories/citas.repository.js';
-import { obtenerCitasPendientes, asignarEmpleado, findByEmpleadoId, update } from '../repositories/citas.repository.js';
+import { obtenerCitasPendientes, asignarEmpleado, findByEmpleadoId, update, findHistoryByPetId } from '../repositories/citas.repository.js';
 import { validateCitaCreation } from '../middleware/validation.middleware.js';
 
 const router = Router();
@@ -203,6 +203,23 @@ router.put('/:id', async (req, res) => {
     } catch (error) {
         console.error("Error actualizando cita:", error);
         res.status(500).json({ success: false, message: 'Error interno al actualizar la cita.' });
+    }
+});
+
+/**
+ * HISTORIAL DE MASCOTA: Devuelve las citas y observaciones de una mascota específica.
+ */
+router.get('/historial/:id_mascota', async (req, res) => {
+    try {
+        const { id_mascota } = req.params;
+        const id_usuario = req.id_usuario; // Viene del middleware de sesión
+
+        const historial = await findHistoryByPetId(id_mascota, id_usuario);
+
+        res.status(200).json({ success: true, data: historial });
+    } catch (error) {
+        console.error("Error al obtener historial:", error);
+        res.status(500).json({ success: false, message: 'Error al obtener el historial.' });
     }
 });
 

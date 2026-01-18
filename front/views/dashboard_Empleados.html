@@ -5,6 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Empleados - CANINU</title>
     <link rel="stylesheet" href="/assets/css/styles2.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Estilos específicos para el menú del Dashboard */
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            text-decoration: none;
+            color: #2d3748;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 250px;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border-color: #4A90E2;
+        }
+
+        .menu-card i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #4A90E2;
+            transition: color 0.3s ease;
+        }
+
+        .menu-card:hover i {
+            color: #2c5282;
+        }
+
+        .menu-card h3 {
+            font-size: 1.8rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .menu-card p {
+            color: #718096;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -12,48 +72,52 @@
             <img src="/assets/images/Caninu.png" alt="logoEmpresa" width="100" height="100">
             <h1>CANINU</h1>
         </div>
-        <ol>
-            <li><a href="citas-mes.html">Citas del mes</a></li>
-            <li><a href="controles-emp.html">Controles del día</a></li>
-            <li><a href="#">Reportes diarios</a></li>
-        </ol>
         <div class="user-profile">
             <span id="usernameField">Empleado: </span>
             <div id="CS-button"> <a href="#" id="logoutBtn">Cerrar sesión</a> </div>
         </div>
     </header>
 
-    <section class="dashboard-content">
-        <div class="dashboard-welcome">
+    <section class="dashboard-content" style="display: block; padding-top: 50px;">
+        <div class="dashboard-welcome" style="text-align: center;">
             <h2>Panel del Empleado</h2>
-            <p>Gestiona citas, mascotas atendidas y reportes diarios.</p>
+            <p>Selecciona una opción para comenzar tu jornada.</p>
         </div>
-        <img src="/assets/images/R.png" alt="Dashboard Image">
+        
+        <div class="menu-container">
+            
+            <a href="citas-mes.html" class="menu-card">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Citas del Mes</h3>
+                <p>Visualiza todas tus asignaciones en el calendario.</p>
+            </a>
+
+            <a href="controles-emp.html" class="menu-card">
+                <i class="fas fa-notes-medical"></i>
+                <h3>Controles del Día</h3>
+                <p>Gestiona y atiende a los pacientes programados para hoy.</p>
+            </a>
+
+        </div>
     </section>
 
     <script>
         /**
          * Lógica de Sesión y Logout
-         * Verifica el estado de la sesión del usuario.
-         * RUTA: GET /session-info
-         * Valida que el usuario esté logueado y que su rol sea "empleado".
          */
         async function loadSession() {
             const res = await fetch("/session-info", { credentials: "include" });
             const data = await res.json();
 
-            if (!data.logged || data.user.rol !== "empleado") {
+            // Validación estricta de rol
+            if (!data.logged || (data.user.rol !== "empleado" && data.user.rol !== "admin")) {
                 window.location.href = "login.html";
                 return;
             }
 
-            document.getElementById("usernameField").innerText = "Empleado: " + data.user.username;
+            document.getElementById("usernameField").innerText = "Bienvenido: " + data.user.username;
         }
 
-        /**
-         * Manejador de evento para cerrar sesión.
-         * RUTA: POST /logout
-         */
         document.getElementById("logoutBtn").addEventListener("click", async () => {
             await fetch("/logout", { credentials: "include" });
             window.location.href = "login.html";
