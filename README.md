@@ -34,15 +34,51 @@ CANINU/
 
 ## Configuración e Instalación
 
-### 1. Clonar el repositorio e instalar dependencias
+Sigue estos pasos para correr el proyecto en tu máquina local.
 
-El proyecto utiliza una arquitectura monolítica (Frontend servido por Backend), por lo que solo necesitas instalar dependencias en la raíz.
+### 1. Requisitos Previos
+
+Asegúrate de tener instalado:
+
+- Node.js (v18 o superior)
+
+- PostgreSQL (Instalado localmente en tu sistema operativo)
+
+- Git
+
+### 2. Clonar el repositorio e instalar dependencias
 
 ```bash
-git clone [https://github.com/tu-usuario/CANINU.git](https://github.com/tu-usuario/CANINU.git)
+git clone https://github.com/Andreina-P/CANINU.git
 cd CANINU
 npm install
 ```
+
+### 3. Configurar la Base de Datos
+
+El proyecto requiere una base de datos local. Sigue estos pasos:
+
+1. Abre pgAdmin (o tu terminal de SQL).
+
+2. Crea una base de datos llamada caninu_db.
+
+3. Abre la herramienta de consultas (Query Tool) sobre esa base de datos.
+
+4. Copia el contenido del archivo database.sql (incluido en este repositorio) y ejecútalo. Esto creará todas las tablas necesarias.
+
+### 4. Configurar Variables de Entorno
+
+Abre el nuevo archivo `.env` y edita la línea `DB_PASSWORD` con tu propia contraseña de PostgreSQL.
+
+### 5. Ejecutar el Proyecto
+
+Para iniciar el servidor en modo desarrollo (con recarga automática):
+
+```bash
+npm run dev
+```
+Abre tu navegador en: http://localhost:3000
+
 ## Autores
 Nahomy Llumiquinga -  https://github.com/Naho-10C  
 
